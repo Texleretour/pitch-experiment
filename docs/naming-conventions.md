@@ -1,6 +1,6 @@
 # Naming Conventions
 
-This document defines naming conventions for the pitch experiment project to ensure consistency and maintainability.
+This document defines naming conventions for the pitch experiment project to ensure consistency and maintainability.d
 
 ## General Principles
 
