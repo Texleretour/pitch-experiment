@@ -11,8 +11,8 @@
     "build": "pnpm -r build",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit -p apps/frontend && tsc --noEmit -p apps/backend && tsc --noEmit -p packages/types",
+    "check": "pnpm lint:fix && pnpm type-check"
   },
   "keywords": [],
   "author": "",
