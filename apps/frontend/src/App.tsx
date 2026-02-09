@@ -4,7 +4,7 @@ import { MyButton } from "./component/button";
 import { Link } from "./component/link";
 
 function App() {
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState(0);
 
   return (
     <>
