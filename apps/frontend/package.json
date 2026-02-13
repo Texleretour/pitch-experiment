@@ -17,7 +17,7 @@
     "jspsych": "^8.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@task-experiment/types": "workspace:*"
+    "@pitch-experiment/types": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

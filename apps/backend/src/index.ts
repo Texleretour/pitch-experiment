@@ -1,11 +1,14 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
+import { participantRoutes } from "./routes/participantRoutes";
 
 const fastify = Fastify({ logger: true });
 
 await fastify.register(cors, {
   origin: "http://localhost:5173", // Vite dev server
 });
+
+fastify.register(participantRoutes, { prefix: "/api" });
 
 // Health test
 fastify.get("/health", async () => {

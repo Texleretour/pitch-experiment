@@ -23,6 +23,9 @@ importers:
       '@fastify/cors':
         specifier: ^11.2.0
         version: 11.2.0
+      '@pitch-experiment/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       better-sqlite3:
         specifier: ^12.6.2
         version: 12.6.2
@@ -51,12 +54,12 @@ importers:
       '@jspsych/plugin-preload':
         specifier: ^2.1.0
         version: 2.1.0(jspsych@8.2.3)
+      '@pitch-experiment/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.1(@types/node@24.10.12)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
-      '@task-experiment/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       jspsych:
         specifier: ^8.2.3
         version: 8.2.3

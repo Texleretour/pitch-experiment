@@ -1,7 +1,10 @@
 {
-  "name": "@task-experiment/types",
+  "name": "@pitch-experiment/types",
   "version": "1.0.0",
   "type": "module",
   "main": "./src/index.ts",
-  "types": "./src/index.ts"
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
 }
