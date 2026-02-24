@@ -15,7 +15,9 @@ export async function seedTestData(db: Database.Database) {
     return;
   }
 
-  const insert = db.prepare("INSERT INTO PARTICIPANTS (age) VALUES (@age);");
+  const insert = db.prepare(
+    "INSERT INTO PARTICIPANTS (code, interference_group, octave_group) VALUES (@code, @interference_group, @octave_group);",
+  );
   const { participants } = JSON.parse(
     await readFile(path.join(__dirname, "../../data/seed.json"), "utf8"),
   );
