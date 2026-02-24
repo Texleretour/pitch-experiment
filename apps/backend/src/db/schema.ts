@@ -4,8 +4,6 @@ export function createSchema(db: Database.Database) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS "participants" (
         "code" varchar(8) PRIMARY KEY,
-        "interference_group" bool,
-        "octave_group" bool,
         "created_at" timestamp DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -13,6 +11,7 @@ export function createSchema(db: Database.Database) {
         "trial_number" integer,
         "participant_code" varchar(8),
         "block_id" integer,
+        "interference" bool,
         "reference_to_target_real_distance_cents" integer,
         "is_proposition_correct" bool,
         "is_participant_correct" bool,
@@ -26,6 +25,7 @@ export function createSchema(db: Database.Database) {
         "trial_number" integer,
         "participant_code" varchar(8),
         "block_id" integer,
+        "octave" bool,
         "reference_to_target_real_distance_cents" integer,
         "is_proposition_correct" bool,
         "is_participant_correct" bool,

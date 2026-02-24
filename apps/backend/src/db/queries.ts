@@ -1,3 +1,4 @@
+import type { Participant } from "@pitch-experiment/types";
 import database from ".";
 
 interface ParticipantRow {
@@ -11,5 +12,9 @@ export const participantQueries = {
     return database.prepare("SELECT * FROM PARTICIPANTS WHERE id = ?;").get(id) as
       | ParticipantRow
       | undefined;
+  },
+
+  save: (participant: Participant) => {
+    return database.prepare("INSERT INTO participants (code) VALUES(@code);").run(participant);
   },
 };

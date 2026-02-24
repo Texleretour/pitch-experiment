@@ -1,28 +1,24 @@
 import type { FastifyInstance } from "fastify";
-import { getUserById } from "../services/participantService";
+import { createParticipant, generateParticipantCode } from "../services/participantService";
+
+interface queryStringParameters {
+  firstname: string;
+  lastname: string;
+  birthday: number;
+  birthcity: string;
+}
 
 export async function participantRoutes(fastify: FastifyInstance) {
-  fastify.get<{ Params: { id: string } }>("/participant/:id", async (request, reply) => {
-    const { id } = request.params;
+  fastify.get<{ Querystring: queryStringParameters }>("/participant", async (request, reply) => {
+    const { firstname, lastname, birthday, birthcity }: queryStringParameters = request.query;
 
-    const numericId = Number.parseInt(id, 10);
+    const code = generateParticipantCode(firstname, lastname, birthday, birthcity);
+    const changes = createParticipant(code);
 
-    if (Number.isNaN(numericId) || numericId <= 0) {
-      return reply.code(400).send({
-        success: false,
-        error: "Invalid ID: must be a positive integer",
-      });
+    if (changes === 0) {
+      return reply.code(400).send({ success: false, error: "t deja la" });
     }
 
-    const user = getUserById(numericId);
-
-    if (!user) {
-      return reply.code(404).send({
-        success: false,
-        error: "No user found with that ID",
-      });
-    }
-
-    return { success: true, data: user };
+    return reply.send({ success: true, data: { newRows: changes } });
   });
 }
