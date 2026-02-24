@@ -3,6 +3,8 @@ import { getUserById } from "../services/participantService";
 
 export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>("/participant/:id", async (request, reply) => {
+    console.log("/participant/:id");
+
     const { id } = request.params;
 
     const numericId = Number.parseInt(id, 10);

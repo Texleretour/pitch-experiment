@@ -3,3 +3,9 @@ export interface Participant {
   age: number;
   createdAt: Date;
 }
+
+export interface ApiResponse<T> {
+  success: boolean;
+  error?: string;
+  data?: T;
+}
