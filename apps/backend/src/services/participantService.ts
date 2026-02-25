@@ -40,3 +40,8 @@ export function createParticipant(code: string): number {
 
   return changes;
 }
+
+export function does_access_code_exist(code: string): boolean {
+  const participant = participantQueries.findByCode(code);
+  return participant !== undefined;
+}
