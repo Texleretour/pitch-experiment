@@ -40,3 +40,11 @@ export function createParticipant(code: string): number {
 
   return changes;
 }
+
+export function isCodeActivated(code: string): boolean {
+  const participant = participantQueries.findByCode(code);
+  if (participant) {
+    return !participant.task_completed;
+  }
+  return false;
+}

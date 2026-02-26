@@ -4,7 +4,8 @@ export function createSchema(db: Database.Database) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS "participants" (
         "code" varchar(8) PRIMARY KEY,
-        "created_at" timestamp DEFAULT CURRENT_TIMESTAMP
+        "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+        "task_completed" bool DEFAULT FALSE
     );
 
     CREATE TABLE IF NOT EXISTS "learning_task_trials" (
