@@ -5,7 +5,7 @@ export function createSchema(db: Database.Database) {
     CREATE TABLE IF NOT EXISTS "participants" (
         "code" varchar(8) PRIMARY KEY,
         "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-        "completed" bool DEFAULT FALSE
+        "task_completed" bool DEFAULT FALSE
     );
 
     CREATE TABLE IF NOT EXISTS "learning_task_trials" (

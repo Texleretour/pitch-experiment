@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getAccessCodeInfo } from "./lib/api";
+import { getCodeInfo } from "./lib/api";
 
 function App() {
   const [codeActivation, setCodeActivation] = useState<boolean>();
@@ -7,7 +7,7 @@ function App() {
 
   async function fetchCodeInfo(code: string) {
     try {
-      const { isActivated } = await getAccessCodeInfo(code);
+      const { isActivated } = await getCodeInfo(code);
       setCodeActivation(isActivated);
     } catch (e) {
       console.log(e);

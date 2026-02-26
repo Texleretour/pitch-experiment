@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import {
   createParticipant,
-  doesAccessCodeExist,
   generateParticipantCode,
+  isCodeActivated,
 } from "../services/participantService";
 
 interface queryStringParameters {
@@ -29,10 +29,11 @@ export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { code: string } }>("/code/:code", async (request, reply) => {
     const { code } = request.params;
 
-    const existanceCode = doesAccessCodeExist(code);
-
-    if (!existanceCode) {
-      return reply.send({ success: false, error: `le code '${code}' n'existe pas` });
+    if (!isCodeActivated(code)) {
+      return reply.send({
+        success: false,
+        error: `Code '${code}' is not active (or does not exist)`,
+      });
     }
 
     return reply.send({ success: true, data: code });

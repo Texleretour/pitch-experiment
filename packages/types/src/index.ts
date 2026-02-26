@@ -1,6 +1,7 @@
 export interface Participant {
   code: string;
   createdAt?: Date;
+  taskCompleted?: boolean;
 }
 
 export interface ApiResponse<T> {
