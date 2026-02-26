@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { frontendUrl } from "../../config.json";
 import {
   createParticipant,
   generateParticipantCode,
@@ -23,7 +24,7 @@ export async function participantRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ success: false, error: "t deja la" });
     }
 
-    return reply.send({ success: true, data: { newRows: changes } });
+    return reply.redirect(frontendUrl);
   });
 
   fastify.get<{ Params: { code: string } }>("/code/:code", async (request, reply) => {
