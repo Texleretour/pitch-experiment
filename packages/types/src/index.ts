@@ -3,7 +3,13 @@ export interface Participant {
   createdAt?: Date;
 }
 
-export interface Access_token {
-  access_code: string;
-  existance: boolean;
+export interface ApiResponse<T> {
+  success: boolean;
+  error?: string;
+  data?: T;
+}
+
+export interface isCodeActivated {
+  code: string;
+  isActivated: boolean;
 }

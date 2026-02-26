@@ -4,6 +4,7 @@ import database from ".";
 interface ParticipantRow {
   code: string;
   created_at: string;
+  completed: number;
 }
 
 export const participantQueries = {

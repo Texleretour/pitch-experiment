@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   createParticipant,
-  does_access_code_exist,
+  doesAccessCodeExist,
   generateParticipantCode,
 } from "../services/participantService";
 
@@ -29,12 +29,12 @@ export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { code: string } }>("/code/:code", async (request, reply) => {
     const { code } = request.params;
 
-    const existance_code = does_access_code_exist(code);
+    const existanceCode = doesAccessCodeExist(code);
 
-    if (!existance_code) {
-      return reply.send({ access_code: code, existance: false });
+    if (!existanceCode) {
+      return reply.send({ success: false, error: `le code '${code}' n'existe pas` });
     }
 
-    return reply.send({ access_code: code, existance: true });
+    return reply.send({ success: true, data: code });
   });
 }
