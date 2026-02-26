@@ -1,7 +1,7 @@
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
-import { readFile } from "fs/promises";
 
 export async function seedTestData(db: Database.Database) {
   const __filename = fileURLToPath(import.meta.url);
@@ -15,7 +15,7 @@ export async function seedTestData(db: Database.Database) {
     return;
   }
 
-  const insert = db.prepare("INSERT INTO PARTICIPANTS (age) VALUES (@age);");
+  const insert = db.prepare("INSERT INTO PARTICIPANTS (code) VALUES (@code);");
   const { participants } = JSON.parse(
     await readFile(path.join(__dirname, "../../data/seed.json"), "utf8"),
   );
