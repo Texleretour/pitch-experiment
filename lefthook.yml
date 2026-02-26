@@ -1,7 +1,7 @@
 pre-commit:
   commands:
     lint:
-      glob: "*.{js,ts,jsx,tsx,css}"
+      glob: "*.{js,ts,jsx,tsx,css,json}"
       run: pnpx @biomejs/biome check --write {staged_files}
       stage_fixed: true
 
