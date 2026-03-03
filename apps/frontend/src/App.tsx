@@ -1,45 +1,29 @@
 import { useState } from "react";
-import { getCodeInfo } from "./lib/api";
+import CodeValidator from "./components/CodeValidator";
+import ExplanationsWelcome from "./components/ExplanationsWelcome";
 
+// Default test code: 323jf92d
 function App() {
-  const [codeActivation, setCodeActivation] = useState<boolean>();
-  const [inputCode, setCode] = useState<string>("");
+  const [code, setCode] = useState<string | null>(null);
+  const [experimentStarted, setExperimentStarted] = useState<boolean>(false);
 
-  async function fetchCodeInfo(code: string) {
-    try {
-      const { isActivated } = await getCodeInfo(code);
-      setCodeActivation(isActivated);
-    } catch (e) {
-      console.log(e);
-    }
+  const handleCodeValidation = (code: string | null) => {
+    setCode(code);
+  };
+
+  const handleExperimentStart = () => {
+    setExperimentStarted(true);
+  };
+
+  if (!code) {
+    return <CodeValidator onCodeChange={handleCodeValidation} />;
   }
 
-  function handleValidateCode() {
-    fetchCodeInfo(inputCode);
+  if (!experimentStarted) {
+    return <ExplanationsWelcome onExperimentStart={handleExperimentStart} />;
   }
 
-  return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={inputCode}
-          className="border border-solid px-2 py-1"
-          placeholder="12345678"
-          onChange={(e) => setCode(e.target.value)}
-        />
-        <button
-          type="button"
-          className="border border-solid w-20 h-12"
-          onClick={handleValidateCode}
-        >
-          Validez le code
-        </button>
-      </div>
-      {codeActivation && <div>Le code est activé, next step : lancer l'expé</div>}
-      {!codeActivation && <div>Le code est désactivé, l'expé ne peut pas se lancer</div>}
-    </div>
-  );
+  return <div>Experiment</div>;
 }
 
 export default App;
