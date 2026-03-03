@@ -69,6 +69,9 @@ importers:
       react-dom:
         specifier: ^19.2.0
         version: 19.2.4(react@19.2.4)
+      react-frequency:
+        specifier: ^1.1.1
+        version: 1.1.1
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -1558,6 +1561,9 @@ packages:
     resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
     peerDependencies:
       react: ^19.2.4
+
+  react-frequency@1.1.1:
+    resolution: {integrity: sha512-7B5fR11yRogCYSEjkc4nPCfM/ow9C8/hhFnLtky3hs0rLh8nw1xcIsJVj07ab3UchOF7uxU6Z9CMsK7vjL4Gsg==}
 
   react-refresh@0.18.0:
     resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
@@ -3146,6 +3152,8 @@ snapshots:
     dependencies:
       react: 19.2.4
       scheduler: 0.27.0
+
+  react-frequency@1.1.1: {}
 
   react-refresh@0.18.0: {}
 

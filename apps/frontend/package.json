@@ -13,11 +13,12 @@
     "@jspsych/plugin-audio-keyboard-response": "^2.1.1",
     "@jspsych/plugin-html-keyboard-response": "^2.1.0",
     "@jspsych/plugin-preload": "^2.1.0",
+    "@pitch-experiment/types": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "jspsych": "^8.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "@pitch-experiment/types": "workspace:*"
+    "react-frequency": "^1.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
