@@ -19,11 +19,14 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
     try {
       const { isActivated } = await getCodeInfo(code);
 
-      if (isActivated) {
-        setCodeActivation("activated");
-        onCodeChange(code);
-        console.info(`[Code] Logged in as ${code}`);
+      if (!isActivated) {
+        setCodeActivation("error");
+        return;
       }
+
+      setCodeActivation("activated");
+      onCodeChange(code);
+      console.info(`[Code] Logged in as ${code}`);
     } catch (error) {
       setCodeActivation("error");
       console.error(`Could not fetch code: ${error}`);
@@ -63,7 +66,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
           Validate code
         </button>
       </div>
-      {!codeActivation && (
+      {codeActivation === "error" && (
         <div>
           Code unknown! Please make sure you typed it right. This could also be a problem on our
           end.
