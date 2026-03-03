@@ -2,7 +2,7 @@ import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import ExperimentWrapper from "./ExperimentWrapper";
 
 type LearningTaskProps = {
-  onFinish: (task: "learning" | "inm") => void;
+  onFinish: () => void;
 };
 
 export default function LearningTask({ onFinish }: LearningTaskProps) {
@@ -16,7 +16,7 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
   return (
     <>
       <h1>Learning task</h1>
-      <ExperimentWrapper timeline={timeline} onFinish={onFinish} task="learning" />
+      <ExperimentWrapper timeline={timeline} onFinish={onFinish} />
     </>
   );
 }

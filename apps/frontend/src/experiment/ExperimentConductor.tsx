@@ -5,19 +5,19 @@ import LearningTask from "./LearningTask";
 export default function ExperimentConductor() {
   const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
 
-  const handleStepFinished = (task: "learning" | "inm") => {
-    if (task === "learning") {
-      setExperimentStep("inm");
-    } else if (task === "inm") {
-      setExperimentStep("finished");
-    }
+  const handleLearningFinished = () => {
+    setExperimentStep("inm");
+  };
+
+  const handleINMFinished = () => {
+    setExperimentStep("finished");
   };
 
   switch (experimentStep) {
     case "learning":
-      return <LearningTask onFinish={handleStepFinished} />;
+      return <LearningTask onFinish={handleLearningFinished} />;
     case "inm":
-      return <INMTask onFinish={handleStepFinished} />;
+      return <INMTask onFinish={handleINMFinished} />;
     case "finished":
       return <div>finito pipo gg</div>;
     default:

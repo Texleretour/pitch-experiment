@@ -5,11 +5,10 @@ type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 
 type ExperimentWrapperProps = {
   timeline: Timeline;
-  onFinish: (task: "learning" | "inm") => void;
-  task: "learning" | "inm";
+  onFinish: () => void;
 };
 
-export default function ExperimentWrapper({ timeline, onFinish, task }: ExperimentWrapperProps) {
+export default function ExperimentWrapper({ timeline, onFinish }: ExperimentWrapperProps) {
   const containerRef = useRef(null);
   const hasRun = useRef(false);
 
@@ -20,13 +19,13 @@ export default function ExperimentWrapper({ timeline, onFinish, task }: Experime
     const jsPysch = initJsPsych({
       display_element: containerRef.current,
       on_finish: () => {
-        onFinish(task);
+        onFinish();
         console.log(jsPysch.data.get().json());
       },
     });
 
     jsPysch.run(timeline);
-  }, [timeline, onFinish, task]);
+  }, [timeline, onFinish]);
 
   return <div ref={containerRef} />;
 }
