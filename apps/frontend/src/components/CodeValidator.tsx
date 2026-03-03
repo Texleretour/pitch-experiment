@@ -18,9 +18,9 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
 
     try {
       const { isActivated } = await getCodeInfo(code);
-      setCodeActivation("activated");
 
       if (isActivated) {
+        setCodeActivation("activated");
         onCodeChange(code);
         console.info(`[Code] Logged in as ${code}`);
       }
