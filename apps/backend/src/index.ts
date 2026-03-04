@@ -1,6 +1,7 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
 import { participantRoutes } from "./routes/participantRoutes";
+import { trialRoutes } from "./routes/trialRoutes";
 
 const fastify = Fastify({ logger: true });
 
@@ -9,6 +10,7 @@ await fastify.register(cors, {
 });
 
 fastify.register(participantRoutes, { prefix: "/api" });
+fastify.register(trialRoutes, { prefix: "/api" });
 
 // Health test
 fastify.get("/health", async () => {
