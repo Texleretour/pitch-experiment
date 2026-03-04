@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -15,13 +16,15 @@
   "packageManager": "pnpm@10.28.2",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
+    "@pitch-experiment/types": "workspace:*",
     "better-sqlite3": "^12.6.2",
-    "fastify": "^5.7.4",
-    "@pitch-experiment/types": "workspace:*"
+    "fastify": "^5.7.4"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.2.2",
-    "tsx": "^4.21.0"
+    "@vitest/ui": "^4.0.18",
+    "tsx": "^4.21.0",
+    "vitest": "^4.0.18"
   }
 }
