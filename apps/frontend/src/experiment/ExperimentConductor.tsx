@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { initJsPsych } from "jspsych";
+import { useRef, useState } from "react";
 import INMTask from "./INMTask";
 import LearningTask from "./LearningTask";
 
@@ -13,9 +14,17 @@ export default function ExperimentConductor() {
     setExperimentStep("finished");
   };
 
+  const jsPsychRef = useRef(
+    initJsPsych({
+      show_progess_bar: true,
+    }),
+  );
+
   switch (experimentStep) {
     case "learning":
-      return <LearningTask onFinish={handleLearningFinished} />;
+      return (
+        <LearningTask jsPsychInstance={jsPsychRef.current} onFinish={handleLearningFinished} />
+      );
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":

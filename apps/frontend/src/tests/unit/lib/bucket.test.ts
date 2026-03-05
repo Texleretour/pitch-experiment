@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import Bucket from "../../../utils/bucket";
+import Bucket from "../../../lib/bucket";
 
 describe("Bucket", () => {
   // ========================================
