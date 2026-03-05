@@ -1,5 +1,6 @@
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
-import type { initJsPsych, JsPsych } from "jspsych";
+import { initJsPsych, type JsPsych } from "jspsych";
+import { useEffect, useRef } from "react";
 import Bucket from "../lib/bucket";
 
 const AUDIO_FILES_PATH = "/public/audio/learning/INM_";
@@ -8,7 +9,6 @@ type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 
 type LearningTaskProps = {
   onFinish: () => void;
-  jsPsychInstance: JsPsych;
 };
 
 type LearningBlock = {
@@ -46,7 +46,6 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
   // Scale presentation
   // All the possible targets
   const urlTargets = [
-    { stimulus: `${AUDIO_FILES_PATH}${referenceNumber}.wav` },
     { stimulus: `${AUDIO_FILES_PATH}${referenceNumber}.wav` },
     { stimulus: `${AUDIO_FILES_PATH}${referenceNumber + 1 * 6}.wav` },
     { stimulus: `${AUDIO_FILES_PATH}${referenceNumber + 2 * 6}.wav` },
@@ -148,14 +147,34 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
   };
 };
 
-export default function LearningTask({ onFinish, jsPsychInstance }: LearningTaskProps) {
-  const block: LearningBlock = createLearningBlock(jsPsychInstance);
+export default function LearningTask({ onFinish }: LearningTaskProps) {
+  // Initializing the jsPsych object
 
-  jsPsychInstance.run(block.timeline);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const jsPsychRef = useRef<JsPsych | null>(null);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    if (!containerRef.current) return;
+
+    jsPsychRef.current = initJsPsych({
+      display_element: containerRef.current,
+      show_progress_bar: true,
+    });
+
+    const block = createLearningBlock(jsPsychRef.current);
+
+    jsPsychRef.current.run(block.timeline);
+  }, []);
 
   return (
-    <button type="button" onClick={() => onFinish()}>
-      Learning task blabla
-    </button>
+    <div ref={containerRef}>
+      <button type="button" onClick={() => onFinish()}>
+        Learning task blabla
+      </button>
+    </div>
   );
 }
