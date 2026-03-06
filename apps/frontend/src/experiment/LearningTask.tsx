@@ -5,13 +5,14 @@ import { useEffect, useRef } from "react";
 import Bucket from "../lib/bucket";
 
 const AUDIO_FILES_PATH = "/public/audio/learning/INM_";
-const DEBUG = false;
+const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3]; // the targets are +1, +2, +3 from the reference
 const NOTES = [1]; // all the possible reference notes
 const TRUE_KEY = "l"; // the key of the keyboard to say yes
 const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
+const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 
 type trialData = {
   trial_number: number; // the rank of the trial [1,6]
@@ -21,6 +22,7 @@ type trialData = {
   correct: boolean; // the correctness of the answer of the participant
   realDistance: number; // the real distance of the proposed note
   targetDistanceProposition: number; // the printed distance of the proposed note
+  interference: boolean; // the group attribution about the interference
 };
 
 type LearningTaskProps = {
@@ -131,13 +133,14 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
       // Re-adding the false proposition in the target list
       TARGETS.push(currentTargetDistance);
     }
+    const interference = Math.random() < 0.5;
     // Generate the bloc to present the reference
     const referencePresentation = {
       type: AudioKeyboardResponsePlugin,
       stimulus: urlReference,
       choices: "NO_KEYS",
       trial_duration: 1000,
-      post_trial_gap: 2000,
+      post_trial_gap: interference ? 0 : INTERFERENCE_DURATION, // if interference then no gap because we move on the interference
       prompt: `
       <p>
         <strong>
@@ -148,6 +151,27 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
       on_start: (trial: { stimulus: string }) => {
         const { stimulus } = trial;
         DEBUG && console.log("Reference presentation started ", stimulus);
+      },
+      on_finish: () => {
+        !interference && DEBUG && console.log("No interference");
+      },
+    };
+
+    // Generate the bloc of the interference
+    const interferencePresentation = {
+      type: AudioKeyboardResponsePlugin,
+      stimulus: `${AUDIO_FILES_PATH}baseline.wav`,
+      choices: "NO_KEYS",
+      trial_duration: INTERFERENCE_DURATION,
+      prompt: `
+      <p>
+        <strong>
+        INTERFERENCE SOUND.
+        <strong>
+      <p>
+      `,
+      on_start: () => {
+        DEBUG && console.log("Interference playing");
       },
     };
     // Generate the bloc to present the target during maximum 5s
@@ -182,7 +206,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
         data.correct =
           (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
           (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
-
+        data.interference = interference;
         DEBUG && console.log(data);
       },
     };
@@ -207,7 +231,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
             : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
             Your answer: ${participantAnswer}<br>`
         }
-        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `: Yes (+${lastTrial.realDistance})` : `: No (+${lastTrial.realDistance})`}
+        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
         </strong >
       </p >
   `;
@@ -217,7 +241,9 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
     };
     // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {
-      timeline: [referencePresentation, targetTest, feedback],
+      timeline: interference
+        ? [referencePresentation, interferencePresentation, targetTest, feedback]
+        : [referencePresentation, targetTest, feedback],
     };
     // Adding the trial to the list of all the data
     learningData.data.trialData.push(jsPsychInstance.data.get().last(1).values()[0]);
