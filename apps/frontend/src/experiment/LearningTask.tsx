@@ -5,12 +5,14 @@ import Bucket from "../lib/bucket";
 
 const AUDIO_FILES_PATH = "/public/audio/learning/INM_";
 const DEBUG = true;
+const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3]; // the targets are +1, +2, +3 from the reference
 const NOTES = [1]; // all the possible reference notes
 const TRUE_KEY = "l"; // the key of the keyboard to say yes
 const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
+const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 
 type trialData = {
   trial_number: number; // the rank of the trial [1,6]
@@ -20,6 +22,7 @@ type trialData = {
   correct: boolean; // the correctness of the answer of the participant
   realDistance: number; // the real distance of the proposed note
   targetDistanceProposition: number; // the printed distance of the proposed note
+  interference: boolean; // the group attribution about the interference
 };
 
 type LearningTaskProps = {
@@ -94,15 +97,29 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
     // draw the target
     const currentTargetDistance = targets.draw();
     const urlCurrentTarget = `${AUDIO_FILES_PATH}${referenceNumber + currentTargetDistance * 6}.wav`;
-    // define if the target is true or false
-    const targetProposition = Math.random() < 0.5;
-    // generate the bloc to present the reference during 5s
+    // Define if the target is true or false
+    const isTrue = Math.random() < 0.5;
+    // Initializing the falseProposition for each false question
+    let falseProposition = 0;
+    if (!isTrue) {
+      // Creating the bucket of false possibilites (every target except the real target)
+      const index = TARGETS.indexOf(currentTargetDistance);
+      // Removing the real target from the targets (to have only the false possibilities)
+      TARGETS.splice(index, 1);
+      const falsePossibilities = new Bucket(TARGETS);
+      // Draw new target for the false proposition
+      falseProposition = falsePossibilities.draw();
+      // Re-adding the false proposition in the target list
+      TARGETS.push(currentTargetDistance);
+    }
+    const interference = Math.random() < 0.5;
+    // Generate the bloc to present the reference
     const referencePresentation = {
       type: AudioKeyboardResponsePlugin,
       stimulus: urlReference,
       choices: "NO_KEYS",
       trial_duration: 1000,
-      post_trial_gap: 2000,
+      post_trial_gap: interference ? 0 : INTERFERENCE_DURATION, // if interference then no gap because we move on the interference
       prompt: `
       <p>
         <strong>
@@ -114,8 +131,29 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
         const { stimulus } = trial;
         DEBUG && console.log("Reference presentation started ", stimulus);
       },
+      on_finish: () => {
+        !interference && DEBUG && console.log("No interference");
+      },
     };
-    // generate the bloc to present the target during maximum 5s
+
+    // Generate the bloc of the interference
+    const interferencePresentation = {
+      type: AudioKeyboardResponsePlugin,
+      stimulus: `${AUDIO_FILES_PATH}baseline.wav`,
+      choices: "NO_KEYS",
+      trial_duration: INTERFERENCE_DURATION,
+      prompt: `
+      <p>
+        <strong>
+        INTERFERENCE SOUND.
+        <strong>
+      <p>
+      `,
+      on_start: () => {
+        DEBUG && console.log("Interference playing");
+      },
+    };
+    // Generate the bloc to present the target during maximum 5s
     const targetTest = {
       type: AudioKeyboardResponsePlugin,
       stimulus: urlCurrentTarget,
@@ -147,7 +185,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
         data.correct =
           (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
           (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
-
+        data.interference = interference;
         DEBUG && console.log(data);
       },
     };
@@ -172,7 +210,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
             : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
             Your answer: ${participantAnswer}<br>`
         }
-        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `: Yes (+${lastTrial.realDistance})` : `: No (+${lastTrial.realDistance})`}
+        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
         </strong >
       </p >
   `;
@@ -182,7 +220,9 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
     };
     // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {
-      timeline: [referencePresentation, targetTest],
+      timeline: interference
+        ? [referencePresentation, interferencePresentation, targetTest, feedback]
+        : [referencePresentation, targetTest, feedback],
     };
     // adding the proposition of the target to the list of all the targets of the block
     propositions.push(targetProposition);
