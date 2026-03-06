@@ -1,8 +1,12 @@
 import { useState } from "react";
-import INMTask from "./INMTask";
+import INMTask from "./inm/INMTask";
 import LearningTask from "./LearningTask";
 
-export default function ExperimentConductor() {
+type ExperimentConductorProps = {
+  participantCode: string;
+};
+
+export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
   const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
 
   const handleLearningFinished = () => {
@@ -15,9 +19,9 @@ export default function ExperimentConductor() {
 
   switch (experimentStep) {
     case "learning":
-      return <LearningTask onFinish={handleLearningFinished} />;
+      return <LearningTask onFinish={handleLearningFinished} participantCode={participantCode} />;
     case "inm":
-      return <INMTask onFinish={handleINMFinished} />;
+      return <INMTask onFinish={handleINMFinished} participantCode={participantCode} />;
     case "finished":
       return <div>finito pipo gg</div>;
     default:
