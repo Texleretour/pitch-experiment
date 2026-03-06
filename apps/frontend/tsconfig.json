@@ -12,6 +12,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "typeRoots": ["src/types"],
 
     "strict": true,
     "noUncheckedIndexedAccess": true,
