@@ -6,6 +6,21 @@ import Bucket from "../lib/bucket";
 const AUDIO_FILES_PATH = "/public/audio/learning/INM_";
 const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
+const TARGETS = [1, 2, 3]; // the targets are +1, +2, +3 from the reference
+const NOTES = [1]; // all the possible reference notes
+const TRUE_KEY = "l"; // the key of the keyboard to say yes
+const FALSE_KEY = "s"; // the key of the keyboard to say no
+const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
+
+type trialData = {
+  trial_number: number; // the rank of the trial [1,6]
+  rt: number; // reaction time
+  response: string | null; // the key pressed
+  stimulus: string; // the file of the audio
+  correct: boolean; // the correctness of the answer of the participant
+  realDistance: number; // the real distance of the proposed note
+  targetDistanceProposition: number; // the printed distance of the proposed note
+};
 
 type LearningTaskProps = {
   onFinish: () => void;
@@ -106,8 +121,8 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
       stimulus: urlCurrentTarget,
       choices: ["s", "l"],
       stimulus_duration: 1000,
-      trial_duration: 5000,
-      prompt: targetProposition
+      trial_duration: TIME_TO_ANSWER,
+      prompt: isTrue
         ? `
       <p>
         <strong>
@@ -126,12 +141,46 @@ const createLearningBlock = (jsPsychInstance: JsPsych): LearningBlock => {
         const { stimulus } = trial;
         DEBUG && console.log("Test started ", stimulus);
       },
+      on_finish: (data: trialData) => {
+        data.realDistance = currentTargetDistance;
+        data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
+        data.correct =
+          (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
+          (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
 
-      on_finish: () => {
-        DEBUG && console.log("Test finished");
+        DEBUG && console.log(data);
       },
     };
-    // generate the procedure composed of the presentation of the reference and the presentation of the target
+    // Defining the block for the feedback
+    const feedback = {
+      type: HtmlKeyboardResponsePlugin,
+      stimulus: () => {
+        const lastTrial = jsPsychInstance.data.get().last(1).values()[0];
+        const participantAnswer =
+          lastTrial.response === null
+            ? "Did Not Answered"
+            : lastTrial.response === TRUE_KEY
+              ? "Yes"
+              : "No";
+        return `
+      <p>
+        <strong>
+        ${
+          participantAnswer === "Did Not Answered"
+            ? `You did not answered. <br>
+            You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
+            : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
+            Your answer: ${participantAnswer}<br>`
+        }
+        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `: Yes (+${lastTrial.realDistance})` : `: No (+${lastTrial.realDistance})`}
+        </strong >
+      </p >
+  `;
+      },
+      choices: "NO_KEYS",
+      trial_duration: 5000,
+    };
+    // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {
       timeline: [referencePresentation, targetTest],
     };
