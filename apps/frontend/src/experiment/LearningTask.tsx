@@ -11,6 +11,7 @@ const TARGETS = [1, 2, 3]; // the targets are +1, +2, +3 from the reference
 const NOTES = [1]; // all the possible reference notes
 const TRUE_KEY = "l"; // the key of the keyboard to say yes
 const FALSE_KEY = "s"; // the key of the keyboard to say no
+const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 
 type trialData = {
   trial_number: number; // the rank of the trial [1,6]
@@ -155,7 +156,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
       stimulus: urlCurrentTarget,
       choices: [FALSE_KEY, TRUE_KEY],
       stimulus_duration: 1000,
-      trial_duration: 5000,
+      trial_duration: TIME_TO_ANSWER,
       prompt: isTrue
         ? `
       <p>
@@ -190,19 +191,26 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
       type: HtmlKeyboardResponsePlugin,
       stimulus: () => {
         const lastTrial = jsPsychInstance.data.get().last(1).values()[0];
-        const participantAnswer = lastTrial.response === TRUE_KEY;
+        const participantAnswer =
+          lastTrial.response === null
+            ? "Did Not Answered"
+            : lastTrial.response === TRUE_KEY
+              ? "Yes"
+              : "No";
         return `
       <p>
         <strong>
-        Your answer: ${participantAnswer}<br>
         ${
-          lastTrial.correct
-            ? `Correct ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `: the distance was indeed ${lastTrial.realDistance}` : `The distance was in fact ${lastTrial.realDistance}`}`
-            : `Incorrect : the real interval was +${lastTrial.realDistance}`
+          participantAnswer === "Did Not Answered"
+            ? `You did not answered. <br>
+            You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
+            : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
+            Your answer: ${participantAnswer}<br>`
         }
-        </strong>
-      </p>
-    `;
+        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `: Yes (+${lastTrial.realDistance})` : `: No (+${lastTrial.realDistance})`}
+        </strong >
+      </p >
+  `;
       },
       choices: "NO_KEYS",
       trial_duration: 5000,
