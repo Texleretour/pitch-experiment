@@ -1,21 +1,13 @@
+import type { INMTrialData } from "@pitch-experiment/types";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
 import Bucket from "../../lib/bucket";
 
 type INMTaskProps = {
-  onFinish: () => void;
-  participantCode: string;
+  onFinish: (data: INMTrialData[]) => void;
 };
-
-type INMData = {
-  participantCode: string;
-  data: {
-    distancesToTargets: number[];
-  };
-};
-
-const DEBUG = true;
 
 // From the definition of the INM task from Van Hedger et al. 2015
 const POTENTIAL_TARGET_FREQS = [698.46, 783.99, 830.61, 880];
@@ -46,16 +38,13 @@ const generateINMUnit = (targetFreqs: number[], startingFreqs: number[]) => {
   return new Bucket(Array.from(uniqueCombinations));
 };
 
-export default function INMTask({ onFinish, participantCode }: INMTaskProps) {
+export default function INMTask({ onFinish }: INMTaskProps) {
   const [targetFreq, setTargetFreq] = useState(0);
   const [currentFreq, setCurrentFreq] = useState(0);
   const [trialNumber, setTrialNumber] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
 
-  const INMDataRef = useRef<INMData>({
-    participantCode: participantCode,
-    data: { distancesToTargets: [] },
-  });
+  const INMTrialsDataRef = useRef<INMTrialData[]>([]);
 
   const currentUnit = useRef(1);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -109,7 +98,7 @@ export default function INMTask({ onFinish, participantCode }: INMTaskProps) {
 
   const handleConfirm = async () => {
     const distanceToTarget = calculateError(currentFreq, targetFreq);
-    INMDataRef.current.data.distancesToTargets.push(distanceToTarget);
+    INMTrialsDataRef.current.push({ distanceToTarget: distanceToTarget });
     DEBUG &&
       console.log(
         `[INM] Trial ${trialNumber} | Target freq: ${targetFreq}, current freq: ${currentFreq} -> Distance: ${distanceToTarget.toFixed(0)}`,
@@ -119,7 +108,7 @@ export default function INMTask({ onFinish, participantCode }: INMTaskProps) {
       // Bucket is empty, the unit is completed
       if (currentUnit.current === 2) {
         // If we already did 2 units -> finish the task
-        onFinish();
+        handleFinish();
         return;
       }
 
@@ -141,8 +130,8 @@ export default function INMTask({ onFinish, participantCode }: INMTaskProps) {
 
   // When the task is completed: pass the data back to the Conductor
   const handleFinish = () => {
-    DEBUG && console.log("[INM] INM Data:", INMDataRef.current);
-    onFinish();
+    DEBUG && console.log("[INM] INM Data:", INMTrialsDataRef.current);
+    onFinish(INMTrialsDataRef.current);
   };
 
   // Auto play the target every time it's updated
