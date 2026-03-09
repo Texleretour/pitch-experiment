@@ -9,7 +9,7 @@ type ExperimentConductorProps = {
 };
 
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
-  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("inm");
+  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
 
   const handleLearningFinished = () => {
     setExperimentStep("inm");
@@ -28,7 +28,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
 
   switch (experimentStep) {
     case "learning":
-      return <LearningTask onFinish={handleLearningFinished} />;
+      return <LearningTask onFinish={handleLearningFinished} participantCode={participantCode} />;
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":
