@@ -1,4 +1,4 @@
-import type { Participant } from "@pitch-experiment/types";
+import type { INMTrialData, Participant } from "@pitch-experiment/types";
 import database from ".";
 
 interface ParticipantRow {
@@ -16,5 +16,21 @@ export const participantQueries = {
     return database.prepare("SELECT * FROM participants WHERE code = ?;").get(code) as
       | ParticipantRow
       | undefined;
+  },
+};
+
+export const trialQueries = {
+  saveINMTrials: (participantCode: string, trialsData: INMTrialData[]) => {
+    const insertTrial = database.prepare(
+      "INSERT INTO inm_task_trials (participant_code, trial_number, reference_to_answer_distance_cents) VALUES(?, @trialNumber, @distanceToTarget);",
+    );
+
+    const insertManyTrials = database.transaction((trials: INMTrialData[]) => {
+      for (const trial of trials) {
+        insertTrial.run(participantCode, trial);
+      }
+    });
+
+    insertManyTrials(trialsData);
   },
 };

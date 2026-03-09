@@ -16,6 +16,7 @@ export interface isCodeActivated {
 }
 
 export interface INMTrialData {
+  trialNumber: number;
   distanceToTarget: number;
 }
 
@@ -39,3 +40,8 @@ interface LearningTaskDataVariant {
 }
 
 export type TaskData = TaskDataBase & (INMTaskDataVariant | LearningTaskDataVariant);
+
+export enum TaskTypes {
+  INM = "inm",
+  Learning = "learning",
+}

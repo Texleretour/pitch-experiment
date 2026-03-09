@@ -16,7 +16,7 @@ const POTENTIAL_STARTING_FREQS = [587.33, 622.25, 659.26, 698.46, 932.33, 987.77
 const INTER_TRIAL_GAP_MS = 2000;
 
 const calculateError = (freq1: number, freq2: number): number => {
-  return 36 * Math.log2(freq1 / freq2);
+  return Math.round(36 * Math.log2(freq1 / freq2));
 };
 
 // Source - https://stackoverflow.com/a/47480429
@@ -98,10 +98,13 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   const handleConfirm = async () => {
     const distanceToTarget = calculateError(currentFreq, targetFreq);
-    INMTrialsDataRef.current.push({ distanceToTarget: distanceToTarget });
+    INMTrialsDataRef.current.push({
+      trialNumber: trialNumber,
+      distanceToTarget: distanceToTarget,
+    });
     DEBUG &&
       console.log(
-        `[INM] Trial ${trialNumber} | Target freq: ${targetFreq}, current freq: ${currentFreq} -> Distance: ${distanceToTarget.toFixed(0)}`,
+        `[INM] Trial ${trialNumber} | Target freq: ${targetFreq}, current freq: ${currentFreq} -> Distance: ${distanceToTarget}`,
       );
 
     if (trialMaterialRef.current.length === 0) {

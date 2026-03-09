@@ -1,8 +1,8 @@
-import type { ApiResponse, isCodeActivated } from "@pitch-experiment/types";
+import type { ApiResponse, isCodeActivated, TaskData } from "@pitch-experiment/types";
 
 const BASE_API = "http://localhost:3000/api";
 
-export async function getCodeInfo(code: string): Promise<isCodeActivated> {
+export const getCodeInfo = async (code: string): Promise<isCodeActivated> => {
   const response = await fetch(`${BASE_API}/code/${code}`);
   const responseJson: ApiResponse<string> = await response.json();
 
@@ -15,4 +15,20 @@ export async function getCodeInfo(code: string): Promise<isCodeActivated> {
   }
 
   return { code: code, isActivated: true };
-}
+};
+
+export const postTaskData = async (taskData: TaskData) => {
+  const response = await fetch(`${BASE_API}/participant/data`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(taskData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`There was an error sending the taskData: ${response.statusText}`);
+  }
+
+  return await response.json();
+};

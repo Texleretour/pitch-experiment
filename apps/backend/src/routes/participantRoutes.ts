@@ -1,3 +1,4 @@
+import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
 import { frontendUrl } from "../../config.json";
 import {
@@ -5,6 +6,7 @@ import {
   generateParticipantCode,
   isCodeActivated,
 } from "../services/participantService";
+import { processINMData } from "../services/trialService";
 
 interface queryStringParameters {
   firstname: string;
@@ -38,5 +40,20 @@ export async function participantRoutes(fastify: FastifyInstance) {
     }
 
     return reply.send({ success: true, data: code });
+  });
+
+  fastify.post("/participant/data", async (request, reply) => {
+    const payload = request.body as TaskData;
+    console.log("payload:", payload);
+
+    try {
+      if (payload.taskType === TaskTypes.INM) {
+        processINMData(payload.participantCode, payload.data);
+      }
+    } catch (e) {
+      reply.send({ success: false, error: e });
+    }
+
+    reply.send({ success: true, message: "Successfully saved task data to the server" });
   });
 }
