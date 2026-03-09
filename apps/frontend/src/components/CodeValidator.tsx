@@ -9,7 +9,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
   const [codeActivation, setCodeActivation] = useState<"activated" | "default" | "error">(
     "default",
   );
-  const [inputCode, setInputCode] = useState<string>("");
+  const [inputCode, setInputCode] = useState<string>("323jf92d");
 
   async function fetchCodeInfo(code: string) {
     if (code === "") {

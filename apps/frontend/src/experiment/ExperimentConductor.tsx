@@ -1,30 +1,34 @@
-import { initJsPsych } from "jspsych";
-import { useRef, useState } from "react";
-import INMTask from "./INMTask";
+import type { INMTrialData, TaskData } from "@pitch-experiment/types";
+import { useState } from "react";
+import { DEBUG } from "../../config.json";
+import INMTask from "./inm/INMTask";
 import LearningTask from "./LearningTask";
 
-export default function ExperimentConductor() {
-  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
+type ExperimentConductorProps = {
+  participantCode: string;
+};
+
+export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
+  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("inm");
 
   const handleLearningFinished = () => {
     setExperimentStep("inm");
   };
 
-  const handleINMFinished = () => {
+  const handleINMFinished = (data: INMTrialData[]) => {
     setExperimentStep("finished");
+    const taskData: TaskData = {
+      participantCode: participantCode,
+      taskType: "inm",
+      data: data,
+    };
+    DEBUG && console.log("[Conductor] INM data:", taskData);
+    // Should send the data to the backend here
   };
-
-  const jsPsychRef = useRef(
-    initJsPsych({
-      show_progess_bar: true,
-    }),
-  );
 
   switch (experimentStep) {
     case "learning":
-      return (
-        <LearningTask jsPsychInstance={jsPsychRef.current} onFinish={handleLearningFinished} />
-      );
+      return <LearningTask onFinish={handleLearningFinished} />;
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":
