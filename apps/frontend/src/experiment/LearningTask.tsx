@@ -1,33 +1,35 @@
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
+import type { LearningTrialData } from "@pitch-experiment/types";
 import { initJsPsych, type JsPsych } from "jspsych";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Bucket from "../lib/bucket";
 
-const AUDIO_FILES_PATH = "/public/audio/learning/INM_";
+const AUDIO_FILES_PATH = "/public/audio/learning/";
 const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
-const TARGETS = [1, 2, 3]; // the targets are +1, +2, +3 from the reference
-const NOTES = [1]; // all the possible reference notes
+const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
+const REF_NOTES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // all the possible reference notes
+const NB_BLOCK_PER_UNIT = 4; //it was 6
+const NB_UNIT = 2;
 const TRUE_KEY = "l"; // the key of the keyboard to say yes
 const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 
-type trialData = {
-  trial_number: number; // the rank of the trial [1,6]
-  rt: number; // reaction time
-  response: string | null; // the key pressed
-  stimulus: string; // the file of the audio
-  correct: boolean; // the correctness of the answer of the participant
-  realDistance: number; // the real distance of the proposed note
-  targetDistanceProposition: number; // the printed distance of the proposed note
-  interference: boolean; // the group attribution about the interference
+type JsPsychTrialData = {
+  rt: number;
+  response: string | null;
+  correct: boolean;
+  realDistance: number;
+  targetDistanceProposition: number;
+  interference: boolean;
+  blockNumber: number;
+  unitNumber: number;
 };
 
 type LearningTaskProps = {
-  onFinish: () => void;
-  participantCode: string;
+  onFinish: (data: LearningTrialData[]) => void;
 };
 
 // one learning bloc is the return of the function that creates a block/ It is a timeline and data
@@ -40,9 +42,8 @@ type LearningBlock = {
 
 // the learning data contains the data of the block and the code of the participant
 type LearningData = {
-  participantCode: string;
   data: {
-    trialData: trialData[];
+    trialData: JsPsychTrialData[];
   };
 };
 
@@ -55,19 +56,19 @@ type LearningData = {
  * - Feedback
  * All of this 6 times
  * @param jsPsychInstance the instance of the jsPsych object
- * @param code the participant code
  * @returns
  */
-const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBlock => {
+const createLearningBlock = (
+  jsPsychInstance: JsPsych,
+  referenceBucket: Bucket<number>,
+  blockNumber: number,
+  octaveNumber: number,
+): LearningBlock => {
   // Initializing the block (firstly empty)
   const experimentBlock: Timeline = [];
-
-  // All the potential reference notes that can be picked for 1 block
-  const referenceBucket = new Bucket(NOTES);
-
   // Pick a reference from the bucket
   const referenceNumber = referenceBucket.draw();
-  const urlReference = `${AUDIO_FILES_PATH}${referenceNumber}.wav`;
+  const urlReference = `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber}.wav`;
 
   // Defining the bucket of the +1, +2 and +3 targets (2 times to make 6 questions)
   const targets = new Bucket(TARGETS.concat(TARGETS));
@@ -75,19 +76,18 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
 
   // Initializing the data object with firstly empty data list for the trials (because no trials yet have been done)
   const learningData: LearningData = {
-    participantCode: code,
     data: {
       trialData: [],
     },
   };
 
   // All the possible targets from the reference
-  const urlTargets = [
-    { stimulus: `${AUDIO_FILES_PATH}${referenceNumber}.wav` },
-    { stimulus: `${AUDIO_FILES_PATH}${referenceNumber + 1 * 6}.wav` },
-    { stimulus: `${AUDIO_FILES_PATH}${referenceNumber + 2 * 6}.wav` },
-    { stimulus: `${AUDIO_FILES_PATH}${referenceNumber + 3 * 6}.wav` },
-  ];
+  const urlTargets = [];
+  for (let stim = 0; stim <= TARGETS.length; stim++) {
+    urlTargets.push({
+      stimulus: `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber + stim * 2}.wav`,
+    });
+  }
 
   // Defining the block of the presentation of the scale (a sclae is the reference note and the hree following notes)
   const scalePresentation = {
@@ -105,7 +105,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
     prompt: `
       <p>
         <strong>
-        You are listening to the scale, starting by the reference and its 3 following notes.
+        You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
         <strong>
       <p>
       `,
@@ -117,7 +117,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
   for (let i = 0; i < targetsLength; i++) {
     // Draw the target
     const currentTargetDistance = targets.draw();
-    const urlCurrentTarget = `${AUDIO_FILES_PATH}${referenceNumber + currentTargetDistance * 6}.wav`;
+    const urlCurrentTarget = `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber + currentTargetDistance * 2}.wav`;
     // Define if the target is true or false
     const isTrue = Math.random() < 0.5;
     // Initializing the falseProposition for each false question
@@ -181,6 +181,7 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
       choices: [FALSE_KEY, TRUE_KEY],
       stimulus_duration: 1000,
       trial_duration: TIME_TO_ANSWER,
+      data: { isTargetTrial: true, blockNumber },
       prompt: isTrue
         ? `
       <p>
@@ -200,13 +201,15 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
         const { stimulus } = trial;
         DEBUG && console.log("Test started ", stimulus);
       },
-      on_finish: (data: trialData) => {
+      on_finish: (data: JsPsychTrialData) => {
         data.realDistance = currentTargetDistance;
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =
           (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
           (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
         data.interference = interference;
+        data.blockNumber = blockNumber;
+        data.unitNumber = octaveNumber;
         DEBUG && console.log(data);
       },
     };
@@ -259,39 +262,94 @@ const createLearningBlock = (jsPsychInstance: JsPsych, code: string): LearningBl
   };
 };
 
-export default function LearningTask({ onFinish, participantCode }: LearningTaskProps) {
+const createLearningOctave = (octaveNumber: number, jsPsychInstance: JsPsych) => {
+  const octaveTimeline: Timeline = [];
+  // All the potential reference notes that can be picked for 1 block
+  const referenceBucket = new Bucket(REF_NOTES);
+
+  const inter_block_transition = {
+    type: HtmlKeyboardResponsePlugin,
+    stimulus: `New block of ${TARGETS.length * 2} questions!`,
+    choices: "NO_KEYS",
+    trial_duration: 3000,
+  };
+
+  // Creating a learning block for each block
+  for (let blockNumber = 1; blockNumber <= NB_BLOCK_PER_UNIT; blockNumber++) {
+    const block = createLearningBlock(jsPsychInstance, referenceBucket, blockNumber, octaveNumber);
+    block.timeline.forEach((timelineElement: Timeline) => {
+      octaveTimeline.push([timelineElement]);
+    });
+    if (blockNumber < NB_BLOCK_PER_UNIT) {
+      (octaveTimeline as Array<unknown>).push(inter_block_transition);
+    }
+  }
+  return octaveTimeline;
+};
+
+const createLearningTask = (jsPsychInstance: JsPsych) => {
+  const taskTimeline: Array<unknown> = [];
+
+  const inter_unit_transition = {
+    type: HtmlKeyboardResponsePlugin,
+    stimulus: () =>
+      `PAUSE ! Make a break during 2-3min and come back after. (click on the space bar wwhen you are ready)!`,
+    choices: " ",
+  };
+
+  for (let unitNumber = 1; unitNumber <= NB_UNIT; unitNumber++) {
+    const octave = createLearningOctave(unitNumber, jsPsychInstance);
+    taskTimeline.push({ timeline: octave });
+    if (unitNumber < NB_UNIT) {
+      taskTimeline.push(inter_unit_transition);
+    }
+  }
+
+  return taskTimeline as Timeline;
+};
+
+export default function LearningTask({ onFinish }: LearningTaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
 
+  const handleFinish = useCallback(() => {
+    if (!jsPsychRef.current) return;
+
+    const allTrials = jsPsychRef.current.data
+      .get()
+      .filter({ isTargetTrial: true })
+      .values() as JsPsychTrialData[];
+
+    const learningData: LearningTrialData[] = allTrials.map((trial, index) => ({
+      trialNumber: index + 1,
+      blockNumber: trial.blockNumber,
+      unitNumber: trial.unitNumber,
+      responseTime: trial.rt,
+      isAnswerCorrect: trial.correct,
+      isPropositionCorrect: trial.targetDistanceProposition === trial.realDistance,
+      interference: trial.interference,
+      referenceToTargetRealDistance: trial.realDistance,
+    }));
+
+    DEBUG && console.log(learningData);
+    onFinish(learningData);
+  }, [onFinish]);
+
   useEffect(() => {
     if (hasRun.current) return;
     hasRun.current = true;
-
     if (!containerRef.current) return;
 
     jsPsychRef.current = initJsPsych({
       display_element: containerRef.current,
       show_progress_bar: true,
-      on_finish: onFinish,
+      on_finish: handleFinish,
     });
 
-    const block = createLearningBlock(jsPsychRef.current, participantCode);
+    const timeline = createLearningTask(jsPsychRef.current);
+    jsPsychRef.current.run(timeline);
+  }, [handleFinish]);
 
-    jsPsychRef.current.run(block.timeline);
-  }, [participantCode, onFinish]);
-
-  return (
-    <div>
-      {/* <div id="scale-instruction">
-      <p>
-        <strong>
-          You are listening to the scale, starting by the reference and its 3 following notes.
-        </strong>
-      </p>
-    </div> */}
-
-      <div ref={containerRef}></div>
-    </div>
-  );
+  return <div ref={containerRef}></div>;
 }

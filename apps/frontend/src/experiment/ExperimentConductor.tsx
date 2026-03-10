@@ -28,7 +28,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
 
   switch (experimentStep) {
     case "learning":
-      return <LearningTask onFinish={handleLearningFinished} participantCode={participantCode} />;
+      return <LearningTask onFinish={handleLearningFinished} />;
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":

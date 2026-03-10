@@ -20,8 +20,14 @@ export interface INMTrialData {
 }
 
 export interface LearningTrialData {
-  // just an example
+  trialNumber: number;
+  blockNumber: number;
+  unitNumber: number;
+  responseTime: number;
+  isAnswerCorrect: boolean;
   isPropositionCorrect: boolean;
+  interference: boolean;
+  referenceToTargetRealDistance: number;
 }
 
 interface TaskDataBase {
