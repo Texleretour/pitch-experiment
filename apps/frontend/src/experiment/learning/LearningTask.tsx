@@ -13,6 +13,7 @@ const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the refere
 const REF_NOTES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // all the possible reference notes
 const NB_BLOCK_PER_UNIT = 4; //it was 6
 const NB_UNIT = 2;
+const OCTAVES = [1, 2, 3];
 const TRUE_KEY = "l"; // the key of the keyboard to say yes
 const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
@@ -63,6 +64,7 @@ const createLearningBlock = (
   jsPsychInstance: JsPsych,
   referenceBucket: Bucket<number>,
   blockNumber: number,
+  unitNumber: number,
   octaveNumber: number,
 ): LearningBlock => {
   // Initializing the block (firstly empty)
@@ -217,7 +219,7 @@ const createLearningBlock = (
           (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
         data.interference = interference;
         data.blockNumber = blockNumber;
-        data.unitNumber = octaveNumber;
+        data.unitNumber = unitNumber;
         DEBUG && console.log(data);
       },
     };
@@ -270,7 +272,11 @@ const createLearningBlock = (
   };
 };
 
-const createLearningOctave = (octaveNumber: number, jsPsychInstance: JsPsych) => {
+const createLearningOctave = (
+  unitNumber: number,
+  octaveNumber: number,
+  jsPsychInstance: JsPsych,
+) => {
   const octaveTimeline: Timeline = [];
   // All the potential reference notes that can be picked for 1 block
   const referenceBucket = new Bucket(REF_NOTES);
@@ -284,7 +290,13 @@ const createLearningOctave = (octaveNumber: number, jsPsychInstance: JsPsych) =>
 
   // Creating a learning block for each block
   for (let blockNumber = 1; blockNumber <= NB_BLOCK_PER_UNIT; blockNumber++) {
-    const block = createLearningBlock(jsPsychInstance, referenceBucket, blockNumber, octaveNumber);
+    const block = createLearningBlock(
+      jsPsychInstance,
+      referenceBucket,
+      blockNumber,
+      unitNumber,
+      octaveNumber,
+    );
     block.timeline.forEach((timelineElement: Timeline) => {
       octaveTimeline.push([timelineElement]);
     });
@@ -305,8 +317,11 @@ const createLearningTask = (jsPsychInstance: JsPsych) => {
     choices: " ",
   };
 
+  const octaveBucket = new Bucket(OCTAVES);
+
   for (let unitNumber = 1; unitNumber <= NB_UNIT; unitNumber++) {
-    const octave = createLearningOctave(unitNumber, jsPsychInstance);
+    const octaveNumber = octaveBucket.draw();
+    const octave = createLearningOctave(unitNumber, octaveNumber, jsPsychInstance);
     taskTimeline.push({ timeline: octave });
     if (unitNumber < NB_UNIT) {
       taskTimeline.push(inter_unit_transition);
