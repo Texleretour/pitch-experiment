@@ -109,11 +109,11 @@ const createLearningBlock = (
     timeline_variables: urlTargets,
     prompt: () => {
       let html = `
-      <div id="scale_presentation_title">
-      You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
-        <div id="scale_presentation">`;
+      <div id="piano_presentation_title">
+      <strong> You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes. </strong>
+      <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
-        html += `<div class="scale_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${i - 1}`} </div>`;
+        html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${i - 1}`} </div>`;
       }
       html += `</div> </div>`;
       note_scale_presented++;
@@ -150,14 +150,18 @@ const createLearningBlock = (
       stimulus: urlReference,
       choices: "NO_KEYS",
       trial_duration: 1000,
-      post_trial_gap: interference ? 0 : INTERFERENCE_DURATION, // if interference then no gap because we move on the interference
-      prompt: `
-      <p>
-        <strong>
-        You are listening to the reference.
-        <strong>
-      <p>
-      `,
+      prompt: () => {
+        let html = `
+        <div id="piano_presentation_title">
+        <strong> You are listening the reference note ! </strong>
+        <div id="piano_presentation">`;
+        for (let i = 1; i <= TARGETS.length + 1; i++) {
+          html += `<div class="piano_note ${i === 1 ? 'note_activated"> REF ' : `note_deactivated"> +${i - 1}`} </div>`;
+        }
+        html += `</div> </div>`;
+        DEBUG && console.log(html);
+        return html;
+      },
       on_start: (trial: { stimulus: string }) => {
         const { stimulus } = trial;
         DEBUG && console.log("Reference presentation started ", stimulus);
@@ -167,21 +171,40 @@ const createLearningBlock = (
       },
     };
 
-    // Generate the bloc of the interference
+    // Generate the block of the interference
     const interferencePresentation = {
       type: AudioKeyboardResponsePlugin,
       stimulus: `${AUDIO_FILES_PATH}baseline.wav`,
       choices: "NO_KEYS",
       trial_duration: INTERFERENCE_DURATION,
-      prompt: `
-      <p>
-        <strong>
-        INTERFERENCE SOUND.
-        <strong>
-      <p>
-      `,
-      on_start: () => {
-        DEBUG && console.log("Interference playing");
+      prompt: () => {
+        let html = `<div id="piano_presentation_title">
+      <strong>This is an interference sound !</strong>
+      <div id="piano_presentation">`;
+        for (let i = 1; i <= TARGETS.length + 1; i++) {
+          html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
+        }
+        html += `</div></div>`;
+        return html;
+      },
+    };
+
+    //Generate the block of blank interference
+    const blankGap = {
+      type: HtmlKeyboardResponsePlugin,
+      stimulus: "",
+      choices: "NO_KEYS",
+      trial_duration: INTERFERENCE_DURATION,
+      prompt: () => {
+        let html = `
+        <div id="piano_presentation_title">
+        <strong> You are listening the reference note ! </strong>
+        <div id="piano_presentation">`;
+        for (let i = 1; i <= TARGETS.length + 1; i++) {
+          html += `<div class="piano_note ${i === 1 ? "note_activated" : "note_deactivated"}">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
+        }
+        html += `</div></div>`;
+        return html;
       },
     };
     // Generate the bloc to present the target during maximum 5s
@@ -192,21 +215,36 @@ const createLearningBlock = (
       stimulus_duration: 1000,
       trial_duration: TIME_TO_ANSWER,
       data: { isTargetTrial: true, blockNumber },
-      prompt: isTrue
-        ? `
-      <p>
+      prompt: () => {
+        let html = `
+      <div id="piano_presentation_title">
+        ${
+          isTrue
+            ? `
         <strong>
         Is the note +${currentTargetDistance} from the reference ?
-        <strong>
-      <p>
-      `
-        : `
-      <p>
+        <strong>`
+            : `<p>
         <strong>
         Is the note +${falseProposition} from the reference ?
         <strong>
-      <p>
-      `,
+        <p>`
+        }
+        <div id="piano_presentation">`;
+        for (let i = 1; i <= TARGETS.length + 1; i++) {
+          if (i === 1) {
+            html += `<div class="piano_note note_activated"> REF </div>`;
+          } else {
+            if (isTrue) {
+              html += `<div class="piano_note ${i - 1 === currentTargetDistance ? 'note_question">' : `note_deactivated">`}+${i - 1} </div>`;
+            } else {
+              html += `<div class="piano_note ${i - 1 === falseProposition ? 'note_question">' : `note_deactivated">`}+${i - 1} </div>`;
+            }
+          }
+        }
+        html += `</div> </div>`;
+        return html;
+      },
       on_start: (trial: { stimulus: string }) => {
         const { stimulus } = trial;
         DEBUG && console.log("Test started ", stimulus);
@@ -226,7 +264,8 @@ const createLearningBlock = (
     // Defining the block for the feedback
     const feedback = {
       type: HtmlKeyboardResponsePlugin,
-      stimulus: () => {
+      stimulus: "",
+      prompt: () => {
         const lastTrial = jsPsychInstance.data.get().last(1).values()[0];
         const participantAnswer =
           lastTrial.response === null
@@ -234,20 +273,35 @@ const createLearningBlock = (
             : lastTrial.response === TRUE_KEY
               ? "Yes"
               : "No";
-        return `
-      <p>
-        <strong>
-        ${
-          participantAnswer === "Did Not Answered"
-            ? `You did not answered. <br>
-            You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
-            : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
-            Your answer: ${participantAnswer}<br>`
+        const feedback = `<p>
+          <strong>
+          ${
+            participantAnswer === "Did Not Answered"
+              ? `You did not answered. <br>
+              You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
+              : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
+              Your answer: ${participantAnswer}<br>`
+          }
+          The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
+          </strong >
+        </p >`;
+        let html = `
+    <div id="piano_presentation_title">
+      ${feedback}
+      <div id="piano_presentation">`;
+        for (let i = 1; i <= TARGETS.length + 1; i++) {
+          if (i === 1) {
+            html += `<div class="piano_note note_activated">REF</div>`;
+          } else {
+            if (isTrue) {
+              html += `<div class="piano_note ${i - 1 === currentTargetDistance ? "note_activated" : "note_deactivated"}">+${i - 1}</div>`;
+            } else {
+              html += `<div class="piano_note ${i - 1 === falseProposition ? "note_false" : i - 1 === currentTargetDistance ? "note_activated" : "note_deactivated"}">+${i - 1}</div>`;
+            }
+          }
         }
-        The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
-        </strong >
-      </p >
-  `;
+        html += `</div></div>`;
+        return html;
       },
       choices: "NO_KEYS",
       trial_duration: 5000,
@@ -256,7 +310,7 @@ const createLearningBlock = (
     const test_procedure = {
       timeline: interference
         ? [referencePresentation, interferencePresentation, targetTest, feedback]
-        : [referencePresentation, targetTest, feedback],
+        : [referencePresentation, blankGap, targetTest, feedback],
     };
     // Adding the trial to the list of all the data
     learningData.data.trialData.push(jsPsychInstance.data.get().last(1).values()[0]);
@@ -377,7 +431,8 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
   return (
     <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
       <div id="header">LEARNING TASK</div>
-
+      <div id="false_answer_recall">S</div>
+      <div id="true_answer_recall">L</div>
       <div ref={containerRef}></div>
     </div>
   );
