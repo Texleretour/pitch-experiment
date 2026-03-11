@@ -105,11 +105,6 @@ const createLearningBlock = (
   const scalePresentationProcedure = {
     timeline: [scalePresentation],
     timeline_variables: urlTargets,
-    // <p>
-    //     <strong>
-    //     You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
-    //     <strong>
-    // </p>
     prompt: () => {
       let html = `
       <div id="scale_presentation_title">
