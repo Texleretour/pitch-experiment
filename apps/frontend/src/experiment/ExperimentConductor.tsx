@@ -2,7 +2,7 @@ import type { INMTrialData, TaskData } from "@pitch-experiment/types";
 import { useState } from "react";
 import { DEBUG } from "../../config.json";
 import INMTask from "./inm/INMTask";
-import LearningTask from "./LearningTask";
+import LearningTask from "./learning/LearningTask";
 
 type ExperimentConductorProps = {
   participantCode: string;

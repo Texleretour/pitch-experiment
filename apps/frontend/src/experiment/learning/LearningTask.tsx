@@ -3,7 +3,8 @@ import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import type { LearningTrialData } from "@pitch-experiment/types";
 import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef } from "react";
-import Bucket from "../lib/bucket";
+import Bucket from "../../lib/bucket";
+import "./style_learning.css";
 
 const AUDIO_FILES_PATH = "/public/audio/learning/";
 const DEBUG = true;
@@ -95,20 +96,32 @@ const createLearningBlock = (
     stimulus: jsPsychInstance.timelineVariable("stimulus"),
     choices: "NO_KEYS",
     trial_duration: 1000,
-    post_trial_gap: 200,
+    post_trial_gap: 0,
   };
+
+  let note_scale_presented = 1;
 
   // Defining the procedure of the presentation of the scale
   const scalePresentationProcedure = {
     timeline: [scalePresentation],
     timeline_variables: urlTargets,
-    prompt: `
-      <p>
-        <strong>
-        You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
-        <strong>
-      <p>
-      `,
+    // <p>
+    //     <strong>
+    //     You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
+    //     <strong>
+    // </p>
+    prompt: () => {
+      let html = `
+      <div id="scale_presentation_title">
+      You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
+        <div id="scale_presentation">`;
+      for (let i = 1; i <= TARGETS.length + 1; i++) {
+        html += `<div class="scale_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${i - 1}`} </div>`;
+      }
+      html += `</div> </div>`;
+      note_scale_presented++;
+      return html;
+    },
   };
 
   // Pushing the presentation of the scale before running the block
@@ -343,7 +356,7 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
 
     jsPsychRef.current = initJsPsych({
       display_element: containerRef.current,
-      show_progress_bar: true,
+      //show_progress_bar: true,
       on_finish: handleFinish,
     });
 
@@ -351,5 +364,11 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
     jsPsychRef.current.run(timeline);
   }, [handleFinish]);
 
-  return <div ref={containerRef}></div>;
+  return (
+    <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
+      <div id="header">LEARNING TASK</div>
+
+      <div ref={containerRef}></div>
+    </div>
+  );
 }

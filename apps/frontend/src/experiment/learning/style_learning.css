@@ -1,0 +1,82 @@
+/* div {
+  width: 250px;
+  margin-bottom: 5px;
+  border: 2px solid blue;
+} */
+
+#header {
+  height: 70px;
+  line-height: 60px;
+  background-color: lightgray;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-width: 3px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+}
+
+#scale_presentation_title {
+  height: 70px;
+  line-height: 60px;
+  width: 70%;
+  background-color: lightgray;
+  left: 15%;
+  display: flex;
+  border-width: 3px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: fixed;
+  top: 25%;
+  font-weight: bold;
+}
+
+#scale_presentation {
+  height: 100px;
+  width: 50%;
+  position: fixed;
+  left: 25%;
+  display: flex;
+  top: 40%;
+  border-radius: 25px;
+  gap: 10px;
+}
+
+.scale_note {
+  flex: 1;
+  height: 100%;
+  border-width: 3px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 25px;
+}
+
+.note_activated {
+  background-color: green;
+  line-height: 80px;
+  font-weight: bold;
+}
+
+.note_deactivated {
+  background-color: lightgray;
+  line-height: 80px;
+  font-weight: bold;
+}
+
+#parent {
+  height: 100px;
+}
+
+#child {
+  height: 50%;
+  width: 75%;
+}
