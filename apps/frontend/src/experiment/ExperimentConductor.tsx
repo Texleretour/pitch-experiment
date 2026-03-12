@@ -1,6 +1,7 @@
-import type { INMTrialData, TaskData } from "@pitch-experiment/types";
+import { type INMTrialData, type TaskData, TaskTypes } from "@pitch-experiment/types";
 import { useState } from "react";
 import { DEBUG } from "../../config.json";
+import { postTaskData } from "../lib/api";
 import INMTask from "./inm/INMTask";
 import LearningTask from "./LearningTask";
 
@@ -15,15 +16,17 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     setExperimentStep("inm");
   };
 
-  const handleINMFinished = (data: INMTrialData[]) => {
-    setExperimentStep("finished");
+  const handleINMFinished = async (data: INMTrialData[]) => {
     const taskData: TaskData = {
       participantCode: participantCode,
-      taskType: "inm",
+      taskType: TaskTypes.INM,
       data: data,
     };
     DEBUG && console.log("[Conductor] INM data:", taskData);
-    // Should send the data to the backend here
+
+    await postTaskData(taskData);
+
+    setExperimentStep("finished");
   };
 
   switch (experimentStep) {
