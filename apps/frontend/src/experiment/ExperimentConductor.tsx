@@ -10,7 +10,7 @@ type ExperimentConductorProps = {
 };
 
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
-  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
+  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("inm");
 
   const handleLearningFinished = () => {
     setExperimentStep("inm");
