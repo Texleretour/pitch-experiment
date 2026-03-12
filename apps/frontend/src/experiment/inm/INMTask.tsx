@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
+import ProgressBar from "../../components/ui/ProgressBar";
+import TaskHeader from "../../components/ui/TaskHeader";
 import Bucket from "../../lib/bucket";
 
 type INMTaskProps = {
@@ -43,6 +45,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   const [currentFreq, setCurrentFreq] = useState(0);
   const [trialNumber, setTrialNumber] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [completionPercent, setCompletionPercent] = useState(0);
 
   const INMTrialsDataRef = useRef<INMTrialData[]>([]);
 
@@ -97,6 +100,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   };
 
   const handleConfirm = async () => {
+    setCompletionPercent(Math.round((100 * (trialNumber + 1)) / 64));
+
     const distanceToTarget = calculateError(currentFreq, targetFreq);
     INMTrialsDataRef.current.push({
       trialNumber: trialNumber,
@@ -156,8 +161,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   }, [trialNumber]);
 
   return (
-    <div className="flex flex-col items-center w-screen h-screen mt-20">
-      <h1>INM task</h1>
+    <div className="flex flex-col items-center w-screen h-screen">
+      <TaskHeader title="INM TASK" />
 
       <div className="w-fit flex flex-col gap-4 mt-20">
         {isPaused ? (
@@ -209,8 +214,9 @@ export default function INMTask({ onFinish }: INMTaskProps) {
           </>
         )}
       </div>
+      <ProgressBar progressionPercent={completionPercent} className="absolute bottom-4" />
       {DEBUG && (
-        <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
+        <button type="button" className="absolute bottom-0 left-0" onClick={handleFinish}>
           finish
         </button>
       )}
