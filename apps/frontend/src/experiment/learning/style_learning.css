@@ -1,0 +1,156 @@
+#header {
+  height: 70px;
+  line-height: 70px;
+  background-color: lightgray;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+}
+
+#false_answer_recall {
+  height: 115px;
+  line-height: 115px;
+  background-color: hsl(0, 100%, 50%, 50%);
+  width: 25%;
+  position: fixed;
+  bottom: 10%;
+  left: 12.5%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  border-radius: 25px;
+}
+
+#true_answer_recall {
+  height: 115px;
+  line-height: 115px;
+  background-color: hsl(120, 100%, 25%, 50%);
+  width: 25%;
+  position: fixed;
+  bottom: 10%;
+  right: 12.5%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  border-radius: 25px;
+}
+
+#piano_presentation_title {
+  min-height: 70px;
+  height: auto;
+  line-height: normal;
+  padding: 10px;
+  width: 70%;
+  background-color: lightgray;
+  left: 15%;
+  display: flex;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  text-align: center;
+  color: black;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: fixed;
+  top: 25%;
+  font-weight: bold;
+}
+
+#piano_presentation {
+  height: 100px;
+  width: 50%;
+  position: fixed;
+  left: 25%;
+  display: flex;
+  top: 40%;
+  border-radius: 25px;
+  gap: 10px;
+  justify-content: space-evenly;
+}
+
+.piano_note {
+  display: flex;
+  height: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 25px;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  font-size: 1.4em;
+}
+
+.note_activated {
+  background-color: hsl(120, 100%, 25%, 50%);
+}
+
+.note_deactivated {
+  background-color: lightgray;
+}
+
+.note_question {
+  background-color: hsl(39, 100%, 50%, 50%);
+}
+
+.note_false {
+  background-color: hsl(0, 100%, 50%, 50%);
+}
+
+/*Claude generated .note_glitch and @keyframes glitch */
+
+.note_glitch {
+  background-color: hsl(300, 100%, 25%, 50%);
+  line-height: 80px;
+  font-weight: bold;
+  animation: glitch 0.3s infinite;
+  position: relative;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+    background-color: hsl(300, 100%, 25%, 50%);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: translate(-3px, 2px);
+    background-color: hsl(180, 100%, 50%, 50%);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translate(3px, -2px);
+    background-color: hsl(0, 100%, 50%, 50%);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: translate(-2px, 3px);
+    background-color: hsl(60, 100%, 50%, 50%);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: translate(2px, -3px);
+    background-color: hsl(120, 100%, 50%, 50%);
+    filter: hue-rotate(360deg);
+  }
+  100% {
+    transform: translate(0);
+    background-color: hsl(300, 100%, 25%, 50%);
+    filter: hue-rotate(0deg);
+  }
+}

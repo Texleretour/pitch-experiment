@@ -5,7 +5,7 @@ import ExperimentConductor from "./experiment/ExperimentConductor";
 
 // Default test code: 323jf92d
 function App() {
-  const [code, setCode] = useState<string | null>("323jf92d");
+  const [code, setCode] = useState<string | null>("");
   const [experimentStarted, setExperimentStarted] = useState<boolean>(false);
 
   const handleCodeValidation = (code: string | null) => {

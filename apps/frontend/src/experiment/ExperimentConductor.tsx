@@ -3,14 +3,14 @@ import { useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
 import INMTask from "./inm/INMTask";
-import LearningTask from "./LearningTask";
+import LearningTask from "./learning/LearningTask";
 
 type ExperimentConductorProps = {
   participantCode: string;
 };
 
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
-  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("inm");
+  const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
 
   const handleLearningFinished = () => {
     setExperimentStep("inm");
