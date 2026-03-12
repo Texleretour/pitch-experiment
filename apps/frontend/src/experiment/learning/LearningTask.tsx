@@ -98,7 +98,6 @@ const createLearningBlock = (
     stimulus: jsPsychInstance.timelineVariable("stimulus"),
     choices: "NO_KEYS",
     trial_duration: 1000,
-    post_trial_gap: 0,
   };
 
   let note_scale_presented = 1;
@@ -159,7 +158,6 @@ const createLearningBlock = (
           html += `<div class="piano_note ${i === 1 ? 'note_activated"> REF ' : `note_deactivated"> +${i - 1}`} </div>`;
         }
         html += `</div> </div>`;
-        DEBUG && console.log(html);
         return html;
       },
       on_start: (trial: { stimulus: string }) => {
@@ -222,12 +220,12 @@ const createLearningBlock = (
           isTrue
             ? `
         <strong>
-        Is the note +${currentTargetDistance} from the reference ?
-        <strong>`
+        Is the note +${currentTargetDistance} tone${currentTargetDistance === 1 ? "" : "s"} from the reference ?
+        </strong>`
             : `<p>
         <strong>
-        Is the note +${falseProposition} from the reference ?
-        <strong>
+        Is the note +${falseProposition} tone${falseProposition === 1 ? "" : "s"} from the reference ?
+        </strong>
         <p>`
         }
         <div id="piano_presentation">`;
@@ -282,7 +280,7 @@ const createLearningBlock = (
               : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
               Your answer: ${participantAnswer}<br>`
           }
-          The good answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
+          The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
           </strong >
         </p >`;
         let html = `
@@ -420,7 +418,6 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
 
     jsPsychRef.current = initJsPsych({
       display_element: containerRef.current,
-      //show_progress_bar: true,
       on_finish: handleFinish,
     });
 
