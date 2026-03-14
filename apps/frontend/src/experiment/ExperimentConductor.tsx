@@ -1,4 +1,9 @@
-import { type INMTrialData, type TaskData, TaskTypes } from "@pitch-experiment/types";
+import {
+  type INMTrialData,
+  type LearningTrialData,
+  type TaskData,
+  TaskTypes,
+} from "@pitch-experiment/types";
 import { useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
@@ -12,10 +17,6 @@ type ExperimentConductorProps = {
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
   const [experimentStep, setExperimentStep] = useState<"learning" | "inm" | "finished">("learning");
 
-  const handleLearningFinished = () => {
-    setExperimentStep("inm");
-  };
-
   const handleINMFinished = async (data: INMTrialData[]) => {
     const taskData: TaskData = {
       participantCode: participantCode,
@@ -27,6 +28,19 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     await postTaskData(taskData);
 
     setExperimentStep("finished");
+  };
+
+  const handleLearningFinished = async (data: LearningTrialData[]) => {
+    const taskData: TaskData = {
+      participantCode: participantCode,
+      taskType: TaskTypes.Learning,
+      data: data,
+    };
+    DEBUG && console.log("[Conductor] Learning data:", taskData);
+
+    await postTaskData(taskData);
+
+    setExperimentStep("inm");
   };
 
   switch (experimentStep) {

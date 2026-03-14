@@ -12,27 +12,14 @@ export function createSchema(db: Database.Database) {
         "trial_number" integer,
         "participant_code" varchar(8),
         "block_id" integer,
+        "unit_id" integer,
         "interference" bool,
         "reference_to_target_real_distance_cents" integer,
         "is_proposition_correct" bool,
         "is_participant_correct" bool,
         "response_time_ms" integer,
         "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY ("trial_number", "participant_code", "block_id"),
-        FOREIGN KEY ("participant_code") REFERENCES "participants" ("code")
-    );
-
-    CREATE TABLE IF NOT EXISTS "post_task_trials" (
-        "trial_number" integer,
-        "participant_code" varchar(8),
-        "block_id" integer,
-        "octave" bool,
-        "reference_to_target_real_distance_cents" integer,
-        "is_proposition_correct" bool,
-        "is_participant_correct" bool,
-        "response_time_ms" integer,
-        "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY ("trial_number", "participant_code", "block_id"),
+        PRIMARY KEY ("trial_number", "participant_code", "block_id", "unit_id"),
         FOREIGN KEY ("participant_code") REFERENCES "participants" ("code")
     );
 

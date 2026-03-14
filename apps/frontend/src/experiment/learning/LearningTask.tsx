@@ -109,7 +109,7 @@ const createLearningBlock = (
     prompt: () => {
       let html = `
       <div id="piano_presentation_title">
-      <strong> You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes. </strong>
+      You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
         html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${i - 1}`} </div>`;
@@ -152,7 +152,7 @@ const createLearningBlock = (
       prompt: () => {
         let html = `
         <div id="piano_presentation_title">
-        <strong> You are listening the reference note ! </strong>
+        You are listening the reference note!
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? 'note_activated"> REF ' : `note_deactivated"> +${i - 1}`} </div>`;
@@ -177,7 +177,7 @@ const createLearningBlock = (
       trial_duration: INTERFERENCE_DURATION,
       prompt: () => {
         let html = `<div id="piano_presentation_title">
-      <strong>This is an interference sound !</strong>
+      This is an interference sound!
       <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
@@ -196,7 +196,7 @@ const createLearningBlock = (
       prompt: () => {
         let html = `
         <div id="piano_presentation_title">
-        <strong> You are listening the reference note ! </strong>
+        You are listening the reference note!
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? "note_activated" : "note_deactivated"}">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
@@ -219,14 +219,9 @@ const createLearningBlock = (
         ${
           isTrue
             ? `
-        <strong>
-        Is the note +${currentTargetDistance} tone${currentTargetDistance === 1 ? "" : "s"} from the reference ?
-        </strong>`
-            : `<p>
-        <strong>
-        Is the note +${falseProposition} tone${falseProposition === 1 ? "" : "s"} from the reference ?
-        </strong>
-        <p>`
+        Is the note +${currentTargetDistance} tone${currentTargetDistance === 1 ? "" : "s"} from the reference?`
+            : `
+        Is the note +${falseProposition} tone${falseProposition === 1 ? "" : "s"} from the reference?`
         }
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
@@ -267,26 +262,25 @@ const createLearningBlock = (
         const lastTrial = jsPsychInstance.data.get().last(1).values()[0];
         const participantAnswer =
           lastTrial.response === null
-            ? "Did Not Answered"
+            ? "Did Not Answer"
             : lastTrial.response === TRUE_KEY
               ? "Yes"
               : "No";
         const feedback = `<p>
-          <strong>
           ${
-            participantAnswer === "Did Not Answered"
-              ? `You did not answered. <br>
+            participantAnswer === "Did Not Answer"
+              ? `You did not answer. <br>
               You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
-              : `${lastTrial.correct ? `CORRECT <br>` : `INCORRECT <br>`}
+              : `${lastTrial.correct ? `<p>Your answer is: <span class="feedback" id="feedback_true">CORRECT</span></p>` : `<p>Your answer is: <span class="feedback" id="feedback_false">INCORRECT</span></p>`}
               Your answer: ${participantAnswer}<br>`
           }
           The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
-          </strong >
         </p >`;
         let html = `
     <div id="piano_presentation_title">
       ${feedback}
       <div id="piano_presentation">`;
+
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           if (i === 1) {
             html += `<div class="piano_note note_activated">REF</div>`;
@@ -365,7 +359,7 @@ const createLearningTask = (jsPsychInstance: JsPsych) => {
   const inter_unit_transition = {
     type: HtmlKeyboardResponsePlugin,
     stimulus: () =>
-      `PAUSE ! Make a break during 2-3min and come back after. (click on the space bar wwhen you are ready)!`,
+      `PAUSE! Make a break during 2-3min and come back after. (click on the space bar wwhen you are ready)!`,
     choices: " ",
   };
 
@@ -431,6 +425,11 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
       <div id="false_answer_recall">S</div>
       <div id="true_answer_recall">L</div>
       <div ref={containerRef}></div>
+      {DEBUG && (
+        <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
+          finish
+        </button>
+      )}
     </div>
   );
 }

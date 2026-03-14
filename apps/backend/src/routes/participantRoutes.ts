@@ -6,7 +6,7 @@ import {
   generateParticipantCode,
   isCodeActivated,
 } from "../services/participantService";
-import { processINMData } from "../services/trialService";
+import { processINMData, processLearningData } from "../services/trialService";
 
 interface queryStringParameters {
   firstname: string;
@@ -49,11 +49,13 @@ export async function participantRoutes(fastify: FastifyInstance) {
     try {
       if (payload.taskType === TaskTypes.INM) {
         processINMData(payload.participantCode, payload.data);
+      } else if (payload.taskType === TaskTypes.Learning) {
+        processLearningData(payload.participantCode, payload.data);
       }
     } catch (e) {
-      reply.send({ success: false, error: e });
+      return reply.send({ success: false, error: e });
     }
 
-    reply.send({ success: true, message: "Successfully saved task data to the server" });
+    return reply.send({ success: true, message: "Successfully saved task data to the server" });
   });
 }

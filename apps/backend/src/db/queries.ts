@@ -7,6 +7,17 @@ interface ParticipantRow {
   task_completed: number;
 }
 
+interface LearningTrialDataRow {
+  trialNumber: number;
+  blockNumber: number;
+  unitNumber: number;
+  responseTime: number;
+  isAnswerCorrect: number;
+  isPropositionCorrect: number;
+  interference: number;
+  referenceToTargetRealDistance: number;
+}
+
 export const participantQueries = {
   save: (participant: Participant) => {
     return database.prepare("INSERT INTO participants (code) VALUES(@code);").run(participant);
@@ -26,6 +37,20 @@ export const trialQueries = {
     );
 
     const insertManyTrials = database.transaction((trials: INMTrialData[]) => {
+      for (const trial of trials) {
+        insertTrial.run(participantCode, trial);
+      }
+    });
+
+    insertManyTrials(trialsData);
+  },
+
+  saveLearningTrials: (participantCode: string, trialsData: LearningTrialDataRow[]) => {
+    const insertTrial = database.prepare(
+      "INSERT INTO learning_task_trials (participant_code, trial_number, block_id, unit_id, interference, reference_to_target_real_distance_cents, is_proposition_correct, is_participant_correct, response_time_ms) VALUES(?, @trialNumber, @blockNumber, @unitNumber, @interference, @referenceToTargetRealDistance, @isPropositionCorrect, @isAnswerCorrect, @responseTime);",
+    );
+
+    const insertManyTrials = database.transaction((trials: LearningTrialDataRow[]) => {
       for (const trial of trials) {
         insertTrial.run(participantCode, trial);
       }
