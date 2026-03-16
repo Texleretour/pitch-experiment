@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
 
-const AUDIO_FILES_PATH = "/public/audio/learning/";
+const AUDIO_FILES_PATH = "/audio/learning/";
 const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
@@ -389,6 +389,8 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
       .get()
       .filter({ isTargetTrial: true })
       .values() as JsPsychTrialData[];
+
+    jsPsychRef.current.abortExperiment();
 
     const learningData: LearningTrialData[] = allTrials.map((trial, index) => ({
       trialNumber: index + 1,
