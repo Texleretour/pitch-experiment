@@ -5,7 +5,7 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
-import TaskHeader from "../../components/ui/TaskHeader";
+import Header from "../../components/ui/Header";
 
 const AUDIO_FILES_PATH = "/audio/learning/";
 const DEBUG = true;
@@ -447,7 +447,7 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
 
   return (
     <div className="flex flex-col items-center w-screen h-screen">
-      <TaskHeader title="LEARNING TASK" />
+      <Header title="LEARNING TASK" />
       <div ref={containerRef}></div>
       {falseKey === "s" && (
         <>
