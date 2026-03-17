@@ -2,7 +2,7 @@ import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import type { LearningTrialData } from "@pitch-experiment/types";
 import { initJsPsych, type JsPsych } from "jspsych";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
 
@@ -14,8 +14,6 @@ const REF_NOTES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // all the possible r
 const NB_BLOCK_PER_UNIT = 4; //it was 6
 const NB_UNIT = 2;
 const OCTAVES = [1, 2, 3];
-const TRUE_KEY = "l"; // the key of the keyboard to say yes
-const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 
@@ -66,6 +64,8 @@ const createLearningBlock = (
   blockNumber: number,
   unitNumber: number,
   octaveNumber: number,
+  trueKey: string,
+  falseKey: string,
 ): LearningBlock => {
   // Initializing the block (firstly empty)
   const experimentBlock: Timeline = [];
@@ -209,7 +209,7 @@ const createLearningBlock = (
     const targetTest = {
       type: AudioKeyboardResponsePlugin,
       stimulus: urlCurrentTarget,
-      choices: [FALSE_KEY, TRUE_KEY],
+      choices: [falseKey, trueKey],
       stimulus_duration: 1000,
       trial_duration: TIME_TO_ANSWER,
       data: { isTargetTrial: true, blockNumber },
@@ -246,8 +246,8 @@ const createLearningBlock = (
         data.realDistance = currentTargetDistance;
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =
-          (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
-          (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
+          (data.response === trueKey && data.targetDistanceProposition === data.realDistance) ||
+          (data.response === falseKey && data.targetDistanceProposition !== data.realDistance);
         data.interference = interference;
         data.blockNumber = blockNumber;
         data.unitNumber = unitNumber;
@@ -263,7 +263,7 @@ const createLearningBlock = (
         const participantAnswer =
           lastTrial.response === null
             ? "Did Not Answer"
-            : lastTrial.response === TRUE_KEY
+            : lastTrial.response === trueKey
               ? "Yes"
               : "No";
         const feedback = `<p>
@@ -322,6 +322,8 @@ const createLearningOctave = (
   unitNumber: number,
   octaveNumber: number,
   jsPsychInstance: JsPsych,
+  trueKey: string,
+  falseKey: string,
 ) => {
   const octaveTimeline: Timeline = [];
   // All the potential reference notes that can be picked for 1 block
@@ -342,6 +344,8 @@ const createLearningOctave = (
       blockNumber,
       unitNumber,
       octaveNumber,
+      trueKey,
+      falseKey,
     );
     block.timeline.forEach((timelineElement: Timeline) => {
       octaveTimeline.push([timelineElement]);
@@ -353,7 +357,7 @@ const createLearningOctave = (
   return octaveTimeline;
 };
 
-const createLearningTask = (jsPsychInstance: JsPsych) => {
+const createLearningTask = (jsPsychInstance: JsPsych, trueKey: string, falseKey: string) => {
   const taskTimeline: Array<unknown> = [];
 
   const inter_unit_transition = {
@@ -367,7 +371,13 @@ const createLearningTask = (jsPsychInstance: JsPsych) => {
 
   for (let unitNumber = 1; unitNumber <= NB_UNIT; unitNumber++) {
     const octaveNumber = octaveBucket.draw();
-    const octave = createLearningOctave(unitNumber, octaveNumber, jsPsychInstance);
+    const octave = createLearningOctave(
+      unitNumber,
+      octaveNumber,
+      jsPsychInstance,
+      trueKey,
+      falseKey,
+    );
     taskTimeline.push({ timeline: octave });
     if (unitNumber < NB_UNIT) {
       taskTimeline.push(inter_unit_transition);
@@ -381,6 +391,19 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
+
+  const [trueKey, setTrueKey] = useState("l");
+  const [falseKey, setFalseKey] = useState("s");
+
+  useEffect(() => {
+    if (Math.random() > 0.5) {
+      setTrueKey("l");
+      setFalseKey("s");
+    } else {
+      setTrueKey("s");
+      setFalseKey("l");
+    }
+  }, []);
 
   const handleFinish = useCallback(() => {
     if (!jsPsychRef.current) return;
@@ -417,15 +440,25 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
       on_finish: handleFinish,
     });
 
-    const timeline = createLearningTask(jsPsychRef.current);
+    const timeline = createLearningTask(jsPsychRef.current, trueKey, falseKey);
     jsPsychRef.current.run(timeline);
-  }, [handleFinish]);
+  }, [handleFinish, trueKey, falseKey]);
 
   return (
     <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
       <div id="header">LEARNING TASK</div>
-      <div id="false_answer_recall">S</div>
-      <div id="true_answer_recall">L</div>
+      {falseKey === "s" && (
+        <>
+          <div id="false_answer_recall_left">{falseKey.toUpperCase()}</div>
+          <div id="true_answer_recall_right">{trueKey.toUpperCase()}</div>
+        </>
+      )}
+      {falseKey === "l" && (
+        <>
+          <div id="false_answer_recall_right">{falseKey.toUpperCase()}</div>
+          <div id="true_answer_recall_left">{trueKey.toUpperCase()}</div>
+        </>
+      )}
       <div ref={containerRef}></div>
       {DEBUG && (
         <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>

@@ -1,7 +1,7 @@
 import AudioKeyboardResponsePlugin from "@jspsych/plugin-audio-keyboard-response";
 import HtmlKeyboardResponsePlugin from "@jspsych/plugin-html-keyboard-response";
 import { initJsPsych, type JsPsych } from "jspsych";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
 
@@ -9,8 +9,6 @@ const AUDIO_FILES_PATH = "/audio/learning/demo/";
 const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
-const TRUE_KEY = "l"; // the key of the keyboard to say yes
-const FALSE_KEY = "s"; // the key of the keyboard to say no
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 
@@ -42,7 +40,11 @@ type LearningDemoBlock = {
  * @param jsPsychInstance the instance of the jsPsych object
  * @returns
  */
-const createLearningDemo = (jsPsychInstance: JsPsych): LearningDemoBlock => {
+const createLearningDemo = (
+  jsPsychInstance: JsPsych,
+  trueKey: string,
+  falseKey: string,
+): LearningDemoBlock => {
   // Initializing the block (firstly empty)
   const experimentBlock: Timeline = [];
   // Pick a reference from the bucket
@@ -179,7 +181,7 @@ const createLearningDemo = (jsPsychInstance: JsPsych): LearningDemoBlock => {
     const targetTest = {
       type: AudioKeyboardResponsePlugin,
       stimulus: urlCurrentTarget,
-      choices: [FALSE_KEY, TRUE_KEY],
+      choices: [falseKey, trueKey],
       stimulus_duration: 1000,
       trial_duration: TIME_TO_ANSWER,
       data: { isTargetTrial: true },
@@ -216,8 +218,8 @@ const createLearningDemo = (jsPsychInstance: JsPsych): LearningDemoBlock => {
         data.realDistance = currentTargetDistance;
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =
-          (data.response === TRUE_KEY && data.targetDistanceProposition === data.realDistance) ||
-          (data.response === FALSE_KEY && data.targetDistanceProposition !== data.realDistance);
+          (data.response === trueKey && data.targetDistanceProposition === data.realDistance) ||
+          (data.response === trueKey && data.targetDistanceProposition !== data.realDistance);
         DEBUG && console.log(data);
       },
     };
@@ -230,7 +232,7 @@ const createLearningDemo = (jsPsychInstance: JsPsych): LearningDemoBlock => {
         const participantAnswer =
           lastTrial.response === null
             ? "Did Not Answer"
-            : lastTrial.response === TRUE_KEY
+            : lastTrial.response === trueKey
               ? "Yes"
               : "No";
         const feedback = `<p>
@@ -285,6 +287,19 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
 
+  const [trueKey, setTrueKey] = useState("l");
+  const [falseKey, setFalseKey] = useState("s");
+
+  useEffect(() => {
+    if (Math.random() > 0.5) {
+      setTrueKey("l");
+      setFalseKey("s");
+    } else {
+      setTrueKey("s");
+      setFalseKey("l");
+    }
+  }, []);
+
   const handleFinish = useCallback(() => {
     if (!jsPsychRef.current) return;
 
@@ -303,15 +318,25 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
       on_finish: handleFinish,
     });
 
-    const timeline = createLearningDemo(jsPsychRef.current);
+    const timeline = createLearningDemo(jsPsychRef.current, trueKey, falseKey);
     jsPsychRef.current.run(timeline.timeline);
-  }, [handleFinish]);
+  }, [handleFinish, trueKey, falseKey]);
 
   return (
     <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
       <div id="header">LEARNING TASK DEMO</div>
-      <div id="false_answer_recall">S</div>
-      <div id="true_answer_recall">L</div>
+      {trueKey === "s" && (
+        <>
+          <div id="false_answer_recall_left">{trueKey.toUpperCase()}</div>
+          <div id="true_answer_recall_right">{trueKey.toUpperCase()}</div>
+        </>
+      )}
+      {trueKey === "l" && (
+        <>
+          <div id="false_answer_recall_right">{trueKey.toUpperCase()}</div>
+          <div id="true_answer_recall_left">{trueKey.toUpperCase()}</div>
+        </>
+      )}
       <div ref={containerRef}></div>
       {DEBUG && (
         <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
