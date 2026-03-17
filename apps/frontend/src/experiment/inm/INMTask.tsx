@@ -172,11 +172,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   // Auto play the target every time it's updated
   useEffect(() => {
-    const ouais = async () => {
-      playTone(targetFreq);
-    };
-
-    ouais();
+    playTone(targetFreq);
   }, [targetFreq, playTone]);
 
   // On new trial: pick a new reference and target
@@ -202,6 +198,10 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       clearTimeout(timeoutId);
     };
   }, [trialNumber, handleConfirmEvent]);
+
+  useEffect(() => {
+    DEBUG && console.log("[INM] current freq: ", currentFreq);
+  }, [currentFreq]);
 
   useEffect(() => {
     DEBUG && console.log("[INM] current freq: ", currentFreq);
