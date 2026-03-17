@@ -1,9 +1,23 @@
 import type { INMTrialData } from "@pitch-experiment/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
 import Bucket from "../../lib/bucket";
+
+function useEffectEvent<TArgs extends unknown[], TReturn>(
+  fn: (...args: TArgs) => TReturn,
+): (...args: TArgs) => TReturn {
+  const ref = useRef(fn);
+
+  useLayoutEffect(() => {
+    ref.current = fn;
+  });
+
+  return useCallback((...args: TArgs) => {
+    return ref.current(...args);
+  }, []);
+}
 
 type INMTaskProps = {
   onFinish: (data: INMTrialData[]) => void;
@@ -14,6 +28,7 @@ const POTENTIAL_TARGET_FREQS = [698.46, 783.99, 830.61, 880];
 const POTENTIAL_STARTING_FREQS = [587.33, 622.25, 659.26, 698.46, 932.33, 987.77, 1046.5, 1108.73];
 
 const INTER_TRIAL_GAP_MS = 2000;
+const TRIAL_TIMEOUT = DEBUG ? 2500 : 10000;
 
 const calculateError = (freq1: number, freq2: number): number => {
   return Math.round(36 * Math.log2(freq1 / freq2));
@@ -54,6 +69,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   const trialMaterialRef = useRef(
     generateINMUnit(POTENTIAL_TARGET_FREQS, POTENTIAL_STARTING_FREQS),
   );
+
+  const trialTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const initAudioContext = useCallback((): void => {
     if (!audioContextRef.current) {
@@ -97,6 +114,11 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   };
 
   const handleConfirm = async () => {
+    if (trialTimeoutRef.current !== null) {
+      clearTimeout(trialTimeoutRef.current);
+      trialTimeoutRef.current = null;
+    }
+
     const distanceToTarget = calculateError(currentFreq, targetFreq);
     INMTrialsDataRef.current.push({
       trialNumber: trialNumber,
@@ -131,6 +153,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     setTrialNumber((prev) => prev + 1);
   };
 
+  const handleConfirmEvent = useEffectEvent(handleConfirm);
+
   // When the task is completed: pass the data back to the Conductor
   const handleFinish = () => {
     DEBUG && console.log("[INM] INM Data:", INMTrialsDataRef.current);
@@ -153,7 +177,18 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       console.log(
         `[INM] Starting new trial: (${trialNumber}), current freq: ${newCombination.startingFreq}, target freq: ${newCombination.targetFreq}, bucket length: ${trialMaterialRef.current.length} | (trialNumber update)`,
       );
-  }, [trialNumber]);
+
+    const timeoutId = setTimeout(() => {
+      DEBUG && console.log(`[INM] Trial ${trialNumber} timed out`);
+      handleConfirmEvent();
+    }, TRIAL_TIMEOUT);
+
+    trialTimeoutRef.current = timeoutId;
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [trialNumber, handleConfirmEvent]);
 
   return (
     <div className="flex flex-col items-center w-screen h-screen mt-20">
