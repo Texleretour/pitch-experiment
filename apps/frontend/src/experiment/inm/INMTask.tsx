@@ -172,7 +172,11 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   // Auto play the target every time it's updated
   useEffect(() => {
-    playTone(targetFreq);
+    const ouais = async () => {
+      playTone(targetFreq);
+    };
+
+    ouais();
   }, [targetFreq, playTone]);
 
   // On new trial: pick a new reference and target
