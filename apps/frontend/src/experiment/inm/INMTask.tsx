@@ -3,8 +3,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
+import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
-import TaskHeader from "../../components/ui/TaskHeader";
 import Bucket from "../../lib/bucket";
 
 function useEffectEvent<TArgs extends unknown[], TReturn>(
@@ -42,7 +42,10 @@ const calculateError = (freq1: number, freq2: number): number => {
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const generateINMUnit = (targetFreqs: number[], startingFreqs: number[]) => {
-  const uniqueCombinations = new Set<{ targetFreq: number; startingFreq: number }>();
+  const uniqueCombinations = new Set<{
+    targetFreq: number;
+    startingFreq: number;
+  }>();
   for (const targetFreq of targetFreqs) {
     for (const startingFreq of startingFreqs) {
       uniqueCombinations.add({
@@ -86,7 +89,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   }, []);
 
   const playTone = useCallback(
-    (frequency: number, durationSeconds: number = 1): void => {
+    (frequency: number, durationSeconds: number = 1) => {
       initAudioContext();
 
       if (!audioContextRef.current || !gainNodeRef.current) {
@@ -110,7 +113,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     [initAudioContext],
   );
 
-  const adjustCurrentFreq = (steps: number): void => {
+  const adjustCurrentFreq = async (steps: number) => {
     setCurrentFreq(currentFreq * 2 ** (steps / 36));
 
     playTone(currentFreq);
@@ -168,7 +171,11 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   // Auto play the target every time it's updated
   useEffect(() => {
-    playTone(targetFreq);
+    const ouais = async () => {
+      playTone(targetFreq);
+    };
+
+    ouais();
   }, [targetFreq, playTone]);
 
   // On new trial: pick a new reference and target
@@ -197,58 +204,57 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   return (
     <div className="flex flex-col items-center w-screen h-screen">
-      <TaskHeader title="INM TASK" />
+      <Header title="INM TASK" />
 
-      <div className="w-fit flex flex-col gap-4 mt-20">
-        {isPaused ? (
-          <p className="text-2xl">Pausing for {INTER_TRIAL_GAP_MS / 1000} seconds.</p>
-        ) : (
-          <>
+      <main className="h-fit w-screen flex justify-center items-center py-10">
+        <div className="w-fit flex flex-col gap-4">
+          {isPaused ? (
+            <p className="text-center text-2xl">Pausing for 2 seconds</p>
+          ) : (
             <p className="text-center text-2xl">Current frequency: {currentFreq.toFixed(0)} Hz</p>
-            <div className="flex justify-center gap-4">
-              <button type="button" onClick={() => adjustCurrentFreq(-2)}>
-                <img
-                  src={doubleChevron}
-                  alt="-66"
-                  className="rotate-90 w-10"
-                  title="Lower the pitch by 66 cents"
-                />
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(-1)}>
-                <img
-                  src={chevron}
-                  alt="-33"
-                  className="rotate-90 w-10"
-                  title="Lower the pitch by 33 cents"
-                />
-              </button>
-              {/* <img src={audioSvg} alt="audio icon" className="h-12"/> */}
-              <button type="button" onClick={() => playTone(currentFreq)}>
-                Play current pitch
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(1)}>
-                <img
-                  src={chevron}
-                  alt="+33"
-                  className="-rotate-90 w-10"
-                  title="Increase the pitch by 33 cents"
-                />
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(2)}>
-                <img
-                  src={doubleChevron}
-                  alt="+66"
-                  className="-rotate-90 w-10"
-                  title="Increase the pitch by 66 cents"
-                />
-              </button>
-            </div>
-            <button type="button" onClick={handleConfirm}>
-              Confirm
+          )}
+          <div className="flex justify-center gap-4">
+            <button type="button" onClick={() => adjustCurrentFreq(-2)}>
+              <img
+                src={doubleChevron}
+                alt="-66"
+                className="rotate-90 w-10"
+                title="Lower the pitch by 66 cents"
+              />
             </button>
-          </>
-        )}
-      </div>
+            <button type="button" onClick={() => adjustCurrentFreq(-1)}>
+              <img
+                src={chevron}
+                alt="-33"
+                className="rotate-90 w-10"
+                title="Lower the pitch by 33 cents"
+              />
+            </button>
+            <button type="button" onClick={() => playTone(currentFreq)}>
+              Play current pitch
+            </button>
+            <button type="button" onClick={() => adjustCurrentFreq(1)}>
+              <img
+                src={chevron}
+                alt="+33"
+                className="-rotate-90 w-10"
+                title="Increase the pitch by 33 cents"
+              />
+            </button>
+            <button type="button" onClick={() => adjustCurrentFreq(2)}>
+              <img
+                src={doubleChevron}
+                alt="+66"
+                className="-rotate-90 w-10"
+                title="Increase the pitch by 66 cents"
+              />
+            </button>
+          </div>
+          <button type="button" onClick={handleConfirm}>
+            Confirm
+          </button>
+        </div>
+      </main>
       <ProgressBar progressionPercent={completionPercent} className="absolute bottom-4" />
       {DEBUG && (
         <button type="button" className="absolute bottom-0 left-0" onClick={handleFinish}>
