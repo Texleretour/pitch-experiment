@@ -67,7 +67,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.connect(audioContextRef.current.destination);
-      gainNodeRef.current.gain.value = 1;
+      gainNodeRef.current.gain.value = 0.7;
     }
   }, []);
 
@@ -96,10 +96,11 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     [initAudioContext],
   );
 
-  const adjustCurrentFreq = async (steps: number) => {
-    setCurrentFreq(currentFreq * 2 ** (steps / 36));
+  const adjustCurrentFreq = (steps: number) => {
+    const newFreq = currentFreq * 2 ** (steps / 36);
+    setCurrentFreq(newFreq);
 
-    playTone(currentFreq);
+    playTone(newFreq);
   };
 
   const handleConfirm = async () => {
@@ -147,11 +148,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
   // Auto play the target every time it's updated
   useEffect(() => {
-    const ouais = async () => {
-      playTone(targetFreq);
-    };
-
-    ouais();
+    playTone(targetFreq);
   }, [targetFreq, playTone]);
 
   // On new trial: pick a new reference and target
@@ -166,6 +163,10 @@ export default function INMTask({ onFinish }: INMTaskProps) {
         `[INM] Starting new trial: (${trialNumber}), current freq: ${newCombination.startingFreq}, target freq: ${newCombination.targetFreq}, bucket length: ${trialMaterialRef.current.length} | (trialNumber update)`,
       );
   }, [trialNumber]);
+
+  useEffect(() => {
+    DEBUG && console.log("[INM] current freq: ", currentFreq);
+  }, [currentFreq]);
 
   return (
     <div className="flex flex-col items-center w-screen h-screen">
