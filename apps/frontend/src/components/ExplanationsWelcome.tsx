@@ -1,21 +1,19 @@
 import Header from "./ui/Header";
 
-import "../experiment/learning/style_learning.css";
-
 type ExplanationsWelcomeProps = {
   onExperimentStart: () => void;
 };
 
 export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsWelcomeProps) {
   return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen gap-1">
+    <div className="flex flex-col items-center w-screen min-h-screen gap-1">
       <Header title="WELCOME" />
-      <main className="flex flex-col items-center gap-4 py-10">
+      <main className="flex flex-col items-center gap-4 w-full py-10">
         <h1>Explanations</h1>
         <div className="w-2/3">
           <p>
-            You are going to take place in the experiment. As explained in the form you signed before
-            entering here, the experiment is divided into 2 main tasks: the{" "}
+            You are going to take place in the experiment. As explained in the form you signed
+            before entering here, the experiment is divided into 2 main tasks: the{" "}
             <strong>learning task</strong> and the <strong>INM task</strong>.
           </p>
           <p>
@@ -36,8 +34,8 @@ export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsW
             </li>
             <li>
               After the presentation of these 5 notes, 2 notes among the scale will be played again
-              (the "<strong>reference note</strong>" and one of the "<strong>following notes</strong>"
-              which will be your "<strong>target note</strong>").
+              (the "<strong>reference note</strong>" and one of the "
+              <strong>following notes</strong>" which will be your "<strong>target note</strong>").
             </li>
             <li>
               A question will be asked about the distance between those notes.{" "}
@@ -66,7 +64,8 @@ export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsW
             </li>
             <li>
               Use upwards or downwards arrows to modify the pitch of your "
-              <strong>working note</strong>" in order to recreate the "<strong>reference note</strong>
+              <strong>working note</strong>" in order to recreate the "
+              <strong>reference note</strong>
               ".
             </li>
             <li>Once you think you're having a perfect match, confirm your answer.</li>
