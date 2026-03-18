@@ -203,10 +203,6 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     DEBUG && console.log("[INM] current freq: ", currentFreq);
   }, [currentFreq]);
 
-  useEffect(() => {
-    DEBUG && console.log("[INM] current freq: ", currentFreq);
-  }, [currentFreq]);
-
   return (
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="INM TASK" />

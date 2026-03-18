@@ -66,6 +66,10 @@ main {
   background-color: #e5e7eb;
 }
 
+main {
+  background-color: #e5e7eb;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
