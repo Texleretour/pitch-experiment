@@ -3,6 +3,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
+import Header from "../../components/ui/Header";
+import ProgressBar from "../../components/ui/ProgressBar";
 import Bucket from "../../lib/bucket";
 
 function useEffectEvent<TArgs extends unknown[], TReturn>(
@@ -28,7 +30,7 @@ const POTENTIAL_TARGET_FREQS = [698.46, 783.99, 830.61, 880];
 const POTENTIAL_STARTING_FREQS = [587.33, 622.25, 659.26, 698.46, 932.33, 987.77, 1046.5, 1108.73];
 
 const INTER_TRIAL_GAP_MS = 2000;
-const TRIAL_TIMEOUT = DEBUG ? 2500 : 10000;
+const TRIAL_TIMEOUT = DEBUG ? 7000 : 10000;
 
 const calculateError = (freq1: number, freq2: number): number => {
   return Math.round(36 * Math.log2(freq1 / freq2));
@@ -40,7 +42,10 @@ const calculateError = (freq1: number, freq2: number): number => {
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const generateINMUnit = (targetFreqs: number[], startingFreqs: number[]) => {
-  const uniqueCombinations = new Set<{ targetFreq: number; startingFreq: number }>();
+  const uniqueCombinations = new Set<{
+    targetFreq: number;
+    startingFreq: number;
+  }>();
   for (const targetFreq of targetFreqs) {
     for (const startingFreq of startingFreqs) {
       uniqueCombinations.add({
@@ -58,6 +63,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   const [currentFreq, setCurrentFreq] = useState(0);
   const [trialNumber, setTrialNumber] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [completionPercent, setCompletionPercent] = useState(0);
 
   const INMTrialsDataRef = useRef<INMTrialData[]>([]);
 
@@ -78,12 +84,12 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
       gainNodeRef.current = audioContextRef.current.createGain();
       gainNodeRef.current.connect(audioContextRef.current.destination);
-      gainNodeRef.current.gain.value = 1;
+      gainNodeRef.current.gain.value = 0.7;
     }
   }, []);
 
   const playTone = useCallback(
-    (frequency: number, durationSeconds: number = 1): void => {
+    (frequency: number, durationSeconds: number = 1) => {
       initAudioContext();
 
       if (!audioContextRef.current || !gainNodeRef.current) {
@@ -107,10 +113,11 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     [initAudioContext],
   );
 
-  const adjustCurrentFreq = (steps: number): void => {
-    setCurrentFreq(currentFreq * 2 ** (steps / 36));
+  const adjustCurrentFreq = (steps: number) => {
+    const newFreq = currentFreq * 2 ** (steps / 36);
+    setCurrentFreq(newFreq);
 
-    playTone(currentFreq);
+    playTone(newFreq);
   };
 
   const handleConfirm = async () => {
@@ -118,6 +125,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       clearTimeout(trialTimeoutRef.current);
       trialTimeoutRef.current = null;
     }
+
+    setCompletionPercent(Math.round((100 * (trialNumber + 1)) / 64));
 
     const distanceToTarget = calculateError(currentFreq, targetFreq);
     INMTrialsDataRef.current.push({
@@ -190,62 +199,66 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     };
   }, [trialNumber, handleConfirmEvent]);
 
-  return (
-    <div className="flex flex-col items-center w-screen h-screen mt-20">
-      <h1>INM task</h1>
+  useEffect(() => {
+    DEBUG && console.log("[INM] current freq: ", currentFreq);
+  }, [currentFreq]);
 
-      <div className="w-fit flex flex-col gap-4 mt-20">
-        {isPaused ? (
-          <p className="text-2xl">Pausing for {INTER_TRIAL_GAP_MS / 1000} seconds.</p>
-        ) : (
-          <>
+  return (
+    <div className="flex flex-col items-center w-screen h-screen">
+      <Header title="INM TASK" />
+
+      <main className="h-fit w-screen flex justify-center items-center py-10">
+        <div className="w-fit flex flex-col gap-4">
+          {isPaused ? (
+            <p className="text-center text-2xl">Pausing for 2 seconds</p>
+          ) : (
             <p className="text-center text-2xl">Current frequency: {currentFreq.toFixed(0)} Hz</p>
-            <div className="flex justify-center gap-4">
-              <button type="button" onClick={() => adjustCurrentFreq(-2)}>
-                <img
-                  src={doubleChevron}
-                  alt="-66"
-                  className="rotate-90 w-10"
-                  title="Lower the pitch by 66 cents"
-                />
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(-1)}>
-                <img
-                  src={chevron}
-                  alt="-33"
-                  className="rotate-90 w-10"
-                  title="Lower the pitch by 33 cents"
-                />
-              </button>
-              {/* <img src={audioSvg} alt="audio icon" className="h-12"/> */}
-              <button type="button" onClick={() => playTone(currentFreq)}>
-                Play current pitch
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(1)}>
-                <img
-                  src={chevron}
-                  alt="+33"
-                  className="-rotate-90 w-10"
-                  title="Increase the pitch by 33 cents"
-                />
-              </button>
-              <button type="button" onClick={() => adjustCurrentFreq(2)}>
-                <img
-                  src={doubleChevron}
-                  alt="+66"
-                  className="-rotate-90 w-10"
-                  title="Increase the pitch by 66 cents"
-                />
-              </button>
-            </div>
-            <button type="button" onClick={handleConfirm}>
-              Confirm
+          )}
+          <div className="flex justify-center gap-4">
+            <button type="button" onClick={() => adjustCurrentFreq(-2)}>
+              <img
+                src={doubleChevron}
+                alt="-66"
+                className="rotate-90 w-10"
+                title="Lower the pitch by 66 cents"
+              />
             </button>
-          </>
-        )}
-      </div>
+            <button type="button" onClick={() => adjustCurrentFreq(-1)}>
+              <img
+                src={chevron}
+                alt="-33"
+                className="rotate-90 w-10"
+                title="Lower the pitch by 33 cents"
+              />
+            </button>
+            <button type="button" onClick={() => playTone(currentFreq)}>
+              Play current pitch
+            </button>
+            <button type="button" onClick={() => adjustCurrentFreq(1)}>
+              <img
+                src={chevron}
+                alt="+33"
+                className="-rotate-90 w-10"
+                title="Increase the pitch by 33 cents"
+              />
+            </button>
+            <button type="button" onClick={() => adjustCurrentFreq(2)}>
+              <img
+                src={doubleChevron}
+                alt="+66"
+                className="-rotate-90 w-10"
+                title="Increase the pitch by 66 cents"
+              />
+            </button>
+          </div>
+          <button type="button" onClick={handleConfirm}>
+            Confirm
+          </button>
+        </div>
+      </main>
+      <ProgressBar progressionPercent={completionPercent} className="absolute bottom-4" />
       {DEBUG && (
-        <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
+        <button type="button" className="absolute bottom-0 left-0" onClick={handleFinish}>
           finish
         </button>
       )}
