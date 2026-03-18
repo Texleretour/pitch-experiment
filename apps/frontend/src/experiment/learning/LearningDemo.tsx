@@ -11,6 +11,7 @@ type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
+const NB_QUESTION = 4;
 
 type JsPsychTrialData = {
   rt: number;
@@ -52,7 +53,6 @@ const createLearningDemo = (
 
   // Defining the bucket of the +1, +2, +3 and +4 targets (2 times to make 8 questions)
   const targets = new Bucket(TARGETS.concat(TARGETS));
-  const targetsLength = targets.length;
 
   // All the possible targets from the reference
   const urlTargets = [
@@ -94,7 +94,7 @@ const createLearningDemo = (
   // Pushing the presentation of the scale before running the block
   experimentBlock.push(scalePresentationProcedure);
 
-  for (let i = 0; i < targetsLength; i++) {
+  for (let i = 0; i < NB_QUESTION; i++) {
     // Draw the target
     const currentTargetDistance = targets.draw();
     const urlCurrentTarget = `${AUDIO_FILES_PATH}${String.fromCharCode(97 + currentTargetDistance)}.mp3`;
@@ -327,14 +327,14 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
       <div id="header">LEARNING TASK DEMO</div>
       {trueKey === "s" && (
         <>
-          <div id="false_answer_recall_left">{trueKey.toUpperCase()}</div>
-          <div id="true_answer_recall_right">{trueKey.toUpperCase()}</div>
+          <div id="false_answer_recall_left">{falseKey.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_right">{trueKey.toUpperCase()} for TRUE</div>
         </>
       )}
       {trueKey === "l" && (
         <>
-          <div id="false_answer_recall_right">{trueKey.toUpperCase()}</div>
-          <div id="true_answer_recall_left">{trueKey.toUpperCase()}</div>
+          <div id="false_answer_recall_right">{falseKey.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_left">{trueKey.toUpperCase()} for TRUE</div>
         </>
       )}
       <div ref={containerRef}></div>

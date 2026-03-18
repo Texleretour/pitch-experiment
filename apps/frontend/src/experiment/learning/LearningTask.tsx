@@ -363,7 +363,7 @@ const createLearningTask = (jsPsychInstance: JsPsych, trueKey: string, falseKey:
   const inter_unit_transition = {
     type: HtmlKeyboardResponsePlugin,
     stimulus: () =>
-      `PAUSE! Make a break during 2-3min and come back after. (click on the space bar wwhen you are ready)!`,
+      `PAUSE! Take a 2-3min break and come back after. (click on the space bar wwhen you are ready)!`,
     choices: " ",
   };
 

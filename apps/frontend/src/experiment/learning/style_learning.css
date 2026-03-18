@@ -16,7 +16,7 @@
 
 #piano_presentation_inline {
   height: 100px;
-  width: 50%;
+  width: 100%;
   display: flex;
   border-radius: 25px;
   gap: 10px;
