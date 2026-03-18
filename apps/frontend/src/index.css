@@ -2,6 +2,7 @@
 
 ol {
   list-style: numbers;
+  margin: 10px 0 10px 0;
 }
 
 :root {
@@ -32,9 +33,15 @@ body {
   min-height: 100vh;
 }
 
+p,
+li {
+  font-size: 1.1em;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  padding: 10px 0 10px 0;
 }
 
 button {
