@@ -4,7 +4,7 @@ import {
   type TaskData,
   TaskTypes,
 } from "@pitch-experiment/types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
 import INMTask from "./inm/INMTask";
@@ -16,10 +16,20 @@ type ExperimentConductorProps = {
   participantCode: string;
 };
 
+type LearningResponseKeys = {
+  trueKey: string;
+  falseKey: string;
+};
+
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
   const [experimentStep, setExperimentStep] = useState<
     "learningExplanationsBeforeDemo" | "learningDemo" | "learning" | "inm" | "finished"
   >("learningExplanationsBeforeDemo");
+
+  const learningResponseKeys = useRef<LearningResponseKeys>({
+    trueKey: "l", // default value
+    falseKey: "s", // default value
+  });
 
   const handleINMFinished = async (data: INMTrialData[]) => {
     const taskData: TaskData = {
@@ -34,8 +44,16 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     setExperimentStep("finished");
   };
 
-  const handleLearningDemoFinished = async () => {
+  const handleLearningDemoFinished = async (learningRespKeysDefined: LearningResponseKeys) => {
     DEBUG && console.log("[Conductor] Learning Demo finished");
+    learningResponseKeys.current = learningRespKeysDefined;
+    DEBUG &&
+      console.log(
+        "Learning response keys definied: true=",
+        learningResponseKeys.current.trueKey,
+        " false=",
+        learningResponseKeys.current.falseKey,
+      );
 
     setExperimentStep("learning");
   };
@@ -52,6 +70,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
       taskType: TaskTypes.Learning,
       data: data,
     };
+
     DEBUG && console.log("[Conductor] Learning data:", taskData);
 
     await postTaskData(taskData);
@@ -65,7 +84,12 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     case "learningDemo":
       return <LearningDemo onFinish={handleLearningDemoFinished} />;
     case "learning":
-      return <LearningTask onFinish={handleLearningFinished} />;
+      return (
+        <LearningTask
+          responseKeys={learningResponseKeys.current}
+          onFinish={handleLearningFinished}
+        />
+      );
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":
