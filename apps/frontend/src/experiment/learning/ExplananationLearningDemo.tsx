@@ -22,9 +22,9 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Scale</h1>
-          <p>In the demo, every musical note will be replaced by a letter (A, B, C, D, E)</p>
           <p>
-            Here is the <strong>scale:</strong>
+            In the demo, every musical note will be replaced by a letter (A, B, C, D, E). Here is
+            the <strong>scale:</strong>
           </p>
           <div id="piano_presentation_inline">
             <div className="piano_note note_deactivated"> REF </div>
@@ -140,17 +140,19 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>Giving your answer</h1>
-          <p>
-            You can give your answer by using the <strong>keyboard</strong>. "S" and "L" can be
-            used. To know what key corresponds to what answer, look at the colormap at the bottom of
-            the page.
-          </p>
+          <ul>
+            <li>
+              You can give your answer by using the <strong>keyboard</strong>. "S" and "L" can be
+              used. To know what key corresponds to what answer, look at the colormap at the bottom
+              of the page.
+            </li>
+            <li>
+              In this case, "S" stands for <strong>FALSE</strong> and "L" stands for{" "}
+              <strong>TRUE</strong>.
+            </li>
+          </ul>
           <div id="false_answer_recall_left">S for FALSE</div>
           <div id="true_answer_recall_right">L for TRUE</div>
-          <p>
-            In this case, "S" stands for <strong>FALSE</strong> and "L" stands for{" "}
-            <strong>TRUE</strong>.
-          </p>
         </div>
       );
 
@@ -186,14 +188,16 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Interference</h1>
-          <p>
-            Sometimes, just after hearing the reference note, you will hear a disturbing sound. This
-            is an <strong>interference</strong> sound.
-          </p>
-          <p>
-            If you hear it, it is normal. The goal for you is to ignore it and act as if it was not
-            there.
-          </p>
+          <ul>
+            <li>
+              Sometimes, just after hearing the reference note, you will hear a disturbing sound.
+              This is an <strong>interference</strong> sound.
+            </li>
+            <li>
+              If you hear it, it is normal. The goal for you is to ignore it and act as if it was
+              not there.
+            </li>
+          </ul>
         </div>
       );
 
@@ -201,13 +205,15 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>Your turn!</h1>
-          <p>
-            The goal is to be <strong>accurate</strong>. You have 5sec to answer each question.
-          </p>
-          <p>
-            In the demo, you will be asked <strong>4</strong> questions.
-          </p>
-          <p>If you have understood and you are ready, let's start!</p>
+          <ul>
+            <li>
+              The goal is to be <strong>accurate</strong>. You have 5sec to answer each question.
+            </li>
+            <li>
+              In the demo, you will be asked <strong>4</strong> questions.
+            </li>
+            <li>If you have understood and you are ready, let's start!</li>
+          </ul>
         </div>
       );
   }
