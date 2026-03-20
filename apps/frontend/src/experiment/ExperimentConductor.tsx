@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
 import INMTask from "./inm/INMTask";
+import ExplanationLearning from "./learning/ExplananationLearning";
 import ExplanationLearningDemo from "./learning/ExplananationLearningDemo";
 import LearningDemo from "./learning/LearningDemo";
 import LearningTask from "./learning/LearningTask";
@@ -23,7 +24,12 @@ type LearningResponseKeys = {
 
 export default function ExperimentConductor({ participantCode }: ExperimentConductorProps) {
   const [experimentStep, setExperimentStep] = useState<
-    "learningExplanationsBeforeDemo" | "learningDemo" | "learning" | "inm" | "finished"
+    | "learningExplanationsBeforeDemo"
+    | "learningDemo"
+    | "learningExplanations"
+    | "learning"
+    | "inm"
+    | "finished"
   >("learningExplanationsBeforeDemo");
 
   const learningResponseKeys = useRef<LearningResponseKeys>({
@@ -55,13 +61,21 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
         learningResponseKeys.current.falseKey,
       );
 
-    setExperimentStep("learning");
+    setExperimentStep("learningExplanations");
   };
 
-  const handleExplanationLearningDemoFinished = async () => {
-    DEBUG && console.log("[Conductor] Explanations on Learning Demo finished");
+  const handleExplanationsFinished = async () => {
+    switch (experimentStep) {
+      case "learningExplanationsBeforeDemo":
+        DEBUG && console.log("[Conductor] Explanations on Learning Demo finished");
+        setExperimentStep("learningDemo");
+        break;
 
-    setExperimentStep("learningDemo");
+      case "learningExplanations":
+        DEBUG && console.log("[Conductor] Explanations on Learning finished");
+        setExperimentStep("learning");
+        break;
+    }
   };
 
   const handleLearningFinished = async (data: LearningTrialData[]) => {
@@ -80,9 +94,11 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
 
   switch (experimentStep) {
     case "learningExplanationsBeforeDemo":
-      return <ExplanationLearningDemo onFinish={handleExplanationLearningDemoFinished} />;
+      return <ExplanationLearningDemo onFinish={handleExplanationsFinished} />;
     case "learningDemo":
       return <LearningDemo onFinish={handleLearningDemoFinished} />;
+    case "learningExplanations":
+      return <ExplanationLearning onFinish={handleExplanationsFinished} />;
     case "learning":
       return (
         <LearningTask
