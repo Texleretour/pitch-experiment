@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
 import Header from "../../components/ui/Header";
+import ProgressBar from "../../components/ui/ProgressBar";
 
 const AUDIO_FILES_PATH = "/audio/learning/";
 const DEBUG = true;
@@ -30,7 +31,13 @@ type JsPsychTrialData = {
 };
 
 type LearningTaskProps = {
+  responseKeys: LearningResponseKeys;
   onFinish: (data: LearningTrialData[]) => void;
+};
+
+type LearningResponseKeys = {
+  trueKey: string;
+  falseKey: string;
 };
 
 // one learning bloc is the return of the function that creates a block/ It is a timeline and data
@@ -67,6 +74,7 @@ const createLearningBlock = (
   octaveNumber: number,
   trueKey: string,
   falseKey: string,
+  setCompletionPercent: (value: number) => void,
 ): LearningBlock => {
   // Initializing the block (firstly empty)
   const experimentBlock: Timeline = [];
@@ -111,11 +119,12 @@ const createLearningBlock = (
       let html = `
       <div id="piano_presentation_title">
       You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
+      </div>
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
         html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${i - 1}`} </div>`;
       }
-      html += `</div> </div>`;
+      html += `</div>`;
       note_scale_presented++;
       return html;
     },
@@ -154,11 +163,12 @@ const createLearningBlock = (
         let html = `
         <div id="piano_presentation_title">
         You are listening the reference note!
+        </div>
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? 'note_activated"> REF ' : `note_deactivated"> +${i - 1}`} </div>`;
         }
-        html += `</div> </div>`;
+        html += `</div>`;
         return html;
       },
       on_start: (trial: { stimulus: string }) => {
@@ -179,11 +189,12 @@ const createLearningBlock = (
       prompt: () => {
         let html = `<div id="piano_presentation_title">
       This is an interference sound!
+      </div> 
       <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
     };
@@ -198,11 +209,12 @@ const createLearningBlock = (
         let html = `
         <div id="piano_presentation_title">
         You are listening the reference note!
+        </div> 
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? "note_activated" : "note_deactivated"}">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
     };
@@ -224,6 +236,7 @@ const createLearningBlock = (
             : `
         Is the note +${falseProposition} tone${falseProposition === 1 ? "" : "s"} from the reference?`
         }
+        </div> 
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           if (i === 1) {
@@ -236,7 +249,7 @@ const createLearningBlock = (
             }
           }
         }
-        html += `</div> </div>`;
+        html += `</div>`;
         return html;
       },
       on_start: (trial: { stimulus: string }) => {
@@ -244,6 +257,9 @@ const createLearningBlock = (
         DEBUG && console.log("Test started ", stimulus);
       },
       on_finish: (data: JsPsychTrialData) => {
+        DEBUG && console.log("resp: ", data.response);
+        DEBUG && console.log("true k", trueKey);
+        DEBUG && console.log("false k", falseKey);
         data.realDistance = currentTargetDistance;
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =
@@ -253,6 +269,14 @@ const createLearningBlock = (
         data.blockNumber = blockNumber;
         data.unitNumber = unitNumber;
         DEBUG && console.log(data);
+        setCompletionPercent(
+          ((i +
+            1 +
+            targetsLength * (blockNumber - 1) +
+            targetsLength * NB_BLOCK_PER_UNIT * (unitNumber - 1)) *
+            100) /
+            (NB_BLOCK_PER_UNIT * NB_UNIT * targetsLength),
+        );
       },
     };
     // Defining the block for the feedback
@@ -270,16 +294,17 @@ const createLearningBlock = (
         const feedback = `<p>
           ${
             participantAnswer === "Did Not Answer"
-              ? `You did not answer. <br>
-              You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
-              : `${lastTrial.correct ? `<p>Your answer is: <span class="feedback" id="feedback_true">CORRECT</span></p>` : `<p>Your answer is: <span class="feedback" id="feedback_false">INCORRECT</span></p>`}
-              Your answer: ${participantAnswer}<br>`
+              ? `<p><span class="feedback" id="feedback_false">You did not answer.</span></p>
+              <p>You had ${TIME_TO_ANSWER / 1000} sec to answer.</p>`
+              : `${lastTrial.correct ? `<p><span class="feedback" id="feedback_true">CORRECT</span></p>` : `<p><span class="feedback" id="feedback_false">INCORRECT</span></p>`}
+              <p>Your answer: ${participantAnswer === "Yes" ? `<span style="color:green">Yes</span>` : `<span style="color:red">No</span>`}</p>`
           }
-          The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (+${lastTrial.realDistance})` : `No (+${lastTrial.realDistance})`}
+          <p>The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `<span style="color:green">Yes (+${lastTrial.realDistance})</span>` : `<span style="color:red">No (+${lastTrial.realDistance})</span>`}</p>
         </p >`;
         let html = `
     <div id="piano_presentation_title">
       ${feedback}
+      </div> 
       <div id="piano_presentation">`;
 
         for (let i = 1; i <= TARGETS.length + 1; i++) {
@@ -293,7 +318,7 @@ const createLearningBlock = (
             }
           }
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
       choices: "NO_KEYS",
@@ -325,6 +350,7 @@ const createLearningOctave = (
   jsPsychInstance: JsPsych,
   trueKey: string,
   falseKey: string,
+  setCompletionPercent: (value: number) => void,
 ) => {
   const octaveTimeline: Timeline = [];
   // All the potential reference notes that can be picked for 1 block
@@ -347,6 +373,7 @@ const createLearningOctave = (
       octaveNumber,
       trueKey,
       falseKey,
+      setCompletionPercent,
     );
     block.timeline.forEach((timelineElement: Timeline) => {
       octaveTimeline.push([timelineElement]);
@@ -358,7 +385,12 @@ const createLearningOctave = (
   return octaveTimeline;
 };
 
-const createLearningTask = (jsPsychInstance: JsPsych, trueKey: string, falseKey: string) => {
+const createLearningTask = (
+  jsPsychInstance: JsPsych,
+  trueKey: string,
+  falseKey: string,
+  setCompletionPercent: (value: number) => void,
+) => {
   const taskTimeline: Array<unknown> = [];
 
   const inter_unit_transition = {
@@ -378,6 +410,7 @@ const createLearningTask = (jsPsychInstance: JsPsych, trueKey: string, falseKey:
       jsPsychInstance,
       trueKey,
       falseKey,
+      setCompletionPercent,
     );
     taskTimeline.push({ timeline: octave });
     if (unitNumber < NB_UNIT) {
@@ -388,23 +421,14 @@ const createLearningTask = (jsPsychInstance: JsPsych, trueKey: string, falseKey:
   return taskTimeline as Timeline;
 };
 
-export default function LearningTask({ onFinish }: LearningTaskProps) {
+export default function LearningTask({ responseKeys, onFinish }: LearningTaskProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
+  const [completionPercent, setCompletionPercent] = useState(0);
 
-  const [trueKey, setTrueKey] = useState("l");
-  const [falseKey, setFalseKey] = useState("s");
-
-  useEffect(() => {
-    if (Math.random() > 0.5) {
-      setTrueKey("l");
-      setFalseKey("s");
-    } else {
-      setTrueKey("s");
-      setFalseKey("l");
-    }
-  }, []);
+  const trueKey: string = responseKeys.trueKey;
+  const falseKey: string = responseKeys.falseKey;
 
   const handleFinish = useCallback(() => {
     if (!jsPsychRef.current) return;
@@ -441,24 +465,31 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
       on_finish: handleFinish,
     });
 
-    const timeline = createLearningTask(jsPsychRef.current, trueKey, falseKey);
+    const timeline = createLearningTask(
+      jsPsychRef.current,
+      trueKey,
+      falseKey,
+      setCompletionPercent,
+    );
     jsPsychRef.current.run(timeline);
-  }, [handleFinish, trueKey, falseKey]);
+  }, [handleFinish, falseKey, trueKey]);
 
   return (
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="LEARNING TASK" />
-      <div ref={containerRef}></div>
+      <main className="h-fit w-screen flex justify-center items-center py-50">
+        <div ref={containerRef}></div>
+      </main>
       {falseKey === "s" && (
         <>
-          <div id="false_answer_recall_left">{falseKey.toUpperCase()}</div>
-          <div id="true_answer_recall_right">{trueKey.toUpperCase()}</div>
+          <div id="false_answer_recall_left">{falseKey.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_right">{trueKey.toUpperCase()} for TRUE</div>
         </>
       )}
       {falseKey === "l" && (
         <>
-          <div id="false_answer_recall_right">{falseKey.toUpperCase()}</div>
-          <div id="true_answer_recall_left">{trueKey.toUpperCase()}</div>
+          <div id="false_answer_recall_right">{falseKey.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_left">{trueKey.toUpperCase()} for TRUE</div>
         </>
       )}
       {DEBUG && (
@@ -466,6 +497,10 @@ export default function LearningTask({ onFinish }: LearningTaskProps) {
           finish
         </button>
       )}
+      <ProgressBar
+        progressionPercent={Math.round(completionPercent)}
+        className="absolute bottom-4"
+      />
     </div>
   );
 }
