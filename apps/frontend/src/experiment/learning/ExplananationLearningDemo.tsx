@@ -124,7 +124,7 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Question</h1>
-          <p>When a question is asked, the question will appear as following:</p>
+          <p>When a question is asked, the question will appear as follows:</p>
           <div id="piano_presentation_title_inline">Is the note a D?</div>
           <div id="piano_presentation_inline">
             <div className="piano_note note_activated"> REF </div>
@@ -160,7 +160,7 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Feedback</h1>
-          <p>After giving your answer, a feedback will appear as following:</p>
+          <p>After giving your answer, a feedback will appear as follows:</p>
           <div id="piano_presentation_title_inline">
             <p>
               <span className="feedback" id="feedback_true">
