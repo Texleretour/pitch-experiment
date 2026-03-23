@@ -4,6 +4,8 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
+import Header from "../../components/ui/Header";
+import ProgressBar from "../../components/ui/ProgressBar";
 
 const AUDIO_FILES_PATH = "/audio/learning/demo/";
 const DEBUG = true;
@@ -22,7 +24,12 @@ type JsPsychTrialData = {
 };
 
 type LearningDemoProps = {
-  onFinish: () => void;
+  onFinish: (learningReponseKeys: LearningResponseKeys) => void;
+};
+
+type LearningResponseKeys = {
+  trueKey: string;
+  falseKey: string;
 };
 
 // one learning bloc is the return of the function that creates a block/ It is a timeline and data
@@ -45,6 +52,7 @@ const createLearningDemo = (
   jsPsychInstance: JsPsych,
   trueKey: string,
   falseKey: string,
+  setCompletionPercent: (value: number) => void,
 ): LearningDemoBlock => {
   // Initializing the block (firstly empty)
   const experimentBlock: Timeline = [];
@@ -81,11 +89,12 @@ const createLearningDemo = (
       let html = `
       <div id="piano_presentation_title">
       You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
+      </div>
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
         html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `${String.fromCharCode(64 + i)}`} </div>`;
       }
-      html += `</div> </div>`;
+      html += `</div>`;
       note_scale_presented++;
       return html;
     },
@@ -125,11 +134,12 @@ const createLearningDemo = (
         let html = `
         <div id="piano_presentation_title">
         You are listening the reference note!
+        </div>
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? 'note_activated"> REF ' : `note_deactivated"> ${String.fromCharCode(64 + i)}`} </div>`;
         }
-        html += `</div> </div>`;
+        html += `</div>`;
         return html;
       },
       on_start: (trial: { stimulus: string }) => {
@@ -150,11 +160,12 @@ const createLearningDemo = (
       prompt: () => {
         let html = `<div id="piano_presentation_title">
       This is an interference sound!
+      </div>
       <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`}</div>`;
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
     };
@@ -169,14 +180,18 @@ const createLearningDemo = (
         let html = `
         <div id="piano_presentation_title">
         You are listening the reference note!
+        </div>
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           html += `<div class="piano_note ${i === 1 ? "note_activated" : "note_deactivated"}">${i === 1 ? "REF" : `${String.fromCharCode(64 + i)}`}</div>`;
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
     };
+
+    DEBUG && console.log("true key: ", trueKey);
+    DEBUG && console.log("false key: ", falseKey);
     // Generate the bloc to present the target during maximum 5s
     const targetTest = {
       type: AudioKeyboardResponsePlugin,
@@ -195,6 +210,7 @@ const createLearningDemo = (
             : `
         Is the note ${String.fromCharCode(65 + falseProposition)}?`
         }
+        </div>
         <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
           if (i === 1) {
@@ -207,7 +223,7 @@ const createLearningDemo = (
             }
           }
         }
-        html += `</div> </div>`;
+        html += `</div>`;
         return html;
       },
       on_start: (trial: { stimulus: string }) => {
@@ -219,8 +235,9 @@ const createLearningDemo = (
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =
           (data.response === trueKey && data.targetDistanceProposition === data.realDistance) ||
-          (data.response === trueKey && data.targetDistanceProposition !== data.realDistance);
+          (data.response === falseKey && data.targetDistanceProposition !== data.realDistance);
         DEBUG && console.log(data);
+        setCompletionPercent(((i + 1) * 100) / NB_QUESTION);
       },
     };
     // Defining the block for the feedback
@@ -238,16 +255,17 @@ const createLearningDemo = (
         const feedback = `<p>
           ${
             participantAnswer === "Did Not Answer"
-              ? `You did not answer. <br>
-              You had ${TIME_TO_ANSWER / 1000} sec to answer. <br>`
-              : `${lastTrial.correct ? `<p>Your answer is: <span class="feedback" id="feedback_true">CORRECT</span></p>` : `<p>Your answer is: <span class="feedback" id="feedback_false">INCORRECT</span></p>`}
-              Your answer: ${participantAnswer}<br>`
+              ? `<p><span class="feedback" id="feedback_false">You did not answer.</span></p>
+              <p>You had ${TIME_TO_ANSWER / 1000} sec to answer.</p>`
+              : `${lastTrial.correct ? `<p><span class="feedback" id="feedback_true">CORRECT</span></p>` : `<p><span class="feedback" id="feedback_false">INCORRECT</span></p>`}
+              <p>Your answer: ${participantAnswer === "Yes" ? `<span style="color:green">Yes</span>` : `<span style="color:red">No</span>`}</p>`
           }
-          The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `Yes (${String.fromCharCode(65 + lastTrial.realDistance)})` : `No (${String.fromCharCode(65 + lastTrial.realDistance)})`}
+          <p>The answer: ${lastTrial.targetDistanceProposition === lastTrial.realDistance ? `<span style="color:green">Yes (${String.fromCharCode(65 + lastTrial.realDistance)})</span>` : `<span style="color:red">No (${String.fromCharCode(65 + lastTrial.realDistance)})</span>`}</p>
         </p >`;
         let html = `
     <div id="piano_presentation_title">
       ${feedback}
+      </div>
       <div id="piano_presentation">`;
 
         for (let i = 1; i <= TARGETS.length + 1; i++) {
@@ -261,7 +279,7 @@ const createLearningDemo = (
             }
           }
         }
-        html += `</div></div>`;
+        html += `</div>`;
         return html;
       },
       choices: "NO_KEYS",
@@ -286,26 +304,17 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
+  const [completionPercent, setCompletionPercent] = useState(0);
 
-  const [trueKey, setTrueKey] = useState("l");
-  const [falseKey, setFalseKey] = useState("s");
-
-  useEffect(() => {
-    if (Math.random() > 0.5) {
-      setTrueKey("l");
-      setFalseKey("s");
-    } else {
-      setTrueKey("s");
-      setFalseKey("l");
-    }
-  }, []);
+  const trueKey = useRef(Math.random() > 0.5 ? "l" : "s");
+  const falseKey = useRef(trueKey.current === "l" ? "s" : "l");
 
   const handleFinish = useCallback(() => {
     if (!jsPsychRef.current) return;
 
     jsPsychRef.current.abortExperiment();
 
-    onFinish();
+    onFinish({ trueKey: trueKey.current, falseKey: falseKey.current });
   }, [onFinish]);
 
   useEffect(() => {
@@ -318,31 +327,39 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
       on_finish: handleFinish,
     });
 
-    const timeline = createLearningDemo(jsPsychRef.current, trueKey, falseKey);
+    const timeline = createLearningDemo(
+      jsPsychRef.current,
+      trueKey.current,
+      falseKey.current,
+      setCompletionPercent,
+    );
     jsPsychRef.current.run(timeline.timeline);
-  }, [handleFinish, trueKey, falseKey]);
+  }, [handleFinish]);
 
   return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen gap-4">
-      <div id="header">LEARNING TASK DEMO</div>
-      {trueKey === "s" && (
+    <div className="flex flex-col items-center w-screen h-screen">
+      <Header title="LEARNING TASK DEMO" />
+      <main className="h-fit w-screen flex justify-center items-center py-50">
+        <div ref={containerRef}></div>
+      </main>
+      {falseKey.current === "s" && (
         <>
-          <div id="false_answer_recall_left">{falseKey.toUpperCase()} for FALSE</div>
-          <div id="true_answer_recall_right">{trueKey.toUpperCase()} for TRUE</div>
+          <div id="false_answer_recall_left">{falseKey.current.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_right">{trueKey.current.toUpperCase()} for TRUE</div>
         </>
       )}
-      {trueKey === "l" && (
+      {falseKey.current === "l" && (
         <>
-          <div id="false_answer_recall_right">{falseKey.toUpperCase()} for FALSE</div>
-          <div id="true_answer_recall_left">{trueKey.toUpperCase()} for TRUE</div>
+          <div id="false_answer_recall_right">{falseKey.current.toUpperCase()} for FALSE</div>
+          <div id="true_answer_recall_left">{trueKey.current.toUpperCase()} for TRUE</div>
         </>
       )}
-      <div ref={containerRef}></div>
       {DEBUG && (
         <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
           finish
         </button>
       )}
+      <ProgressBar progressionPercent={completionPercent} className="absolute bottom-4" />
     </div>
   );
 }
