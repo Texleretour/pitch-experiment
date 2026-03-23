@@ -87,9 +87,9 @@ function Explanations(currentPage: number) {
           <ul>
             <li>If you have understood and are ready, let's start!</li>
             <li>
-              Remember: the goal is to be{" "}
-              <strong style={{ color: "red", fontSize: "1.2em" }}>ACCURATE</strong>. You'll be given
-              5 maximum seconds to answer!
+              Remember: the goal is to be as{" "}
+              <strong style={{ color: "red", fontSize: "1.2em" }}>ACCURATE</strong> as possible.
+              You'll be given 5 seconds to answer!
             </li>
           </ul>
         </div>
