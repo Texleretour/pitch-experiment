@@ -13,7 +13,7 @@ function Explanations(currentPage: number) {
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>It's over!</h1>
           <p>
-            The <strong>Learning Task Demo</strong> is over, we hope you understood the assignment!{" "}
+            The <strong>Learning Task Demo</strong> is over, we hope you understood the assignment!
           </p>
         </div>
       );
@@ -82,7 +82,7 @@ function Explanations(currentPage: number) {
 
     case 4:
       return (
-        <div className="flex flex-col gap-2 items-start w-full">
+        <div className="flex flex-col gap-2 items-center w-full">
           <h1>Your turn!</h1>
           <ul>
             <li>If you have understood and are ready, let's start!</li>
@@ -105,7 +105,7 @@ export default function ExplanationLearning({ onFinish }: ExplanationsLearningDe
     <div className="flex flex-col items-center w-screen min-h-screen gap-1">
       <Header title="Learning Task" />
       <main className="flex flex-col items-center gap-4 w-full py-10">
-        <div className="min-h-100 w-1/3 flex flex-col justify-center items-center">
+        <div className="min-h-100 w-1/2 flex flex-col justify-center items-center">
           {Explanations(currentPage)}
         </div>
       </main>
