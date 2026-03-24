@@ -7,6 +7,8 @@ import {
 import { useRef, useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
+import FinishPage from "./FinishPage";
+import ExplanationINM from "./inm/ExplanationINM";
 import INMTask from "./inm/INMTask";
 import ExplanationLearning from "./learning/ExplananationLearning";
 import ExplanationLearningDemo from "./learning/ExplananationLearningDemo";
@@ -28,6 +30,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     | "learningDemo"
     | "learningExplanations"
     | "learning"
+    | "inmExplanation"
     | "inm"
     | "finished"
   >("learningExplanationsBeforeDemo");
@@ -75,6 +78,11 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
         DEBUG && console.log("[Conductor] Explanations on Learning finished");
         setExperimentStep("learning");
         break;
+
+      case "inmExplanation":
+        DEBUG && console.log("[Conductor] Explanations on INM finished");
+        setExperimentStep("inm");
+        break;
     }
   };
 
@@ -89,7 +97,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
 
     await postTaskData(taskData);
 
-    setExperimentStep("inm");
+    setExperimentStep("inmExplanation");
   };
 
   switch (experimentStep) {
@@ -106,10 +114,12 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
           onFinish={handleLearningFinished}
         />
       );
+    case "inmExplanation":
+      return <ExplanationINM onFinish={handleExplanationsFinished} />;
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":
-      return <div>finito pipo gg</div>;
+      return <FinishPage />;
     default:
       return <div>wa zbi cquoi ca</div>;
   }

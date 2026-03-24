@@ -53,7 +53,7 @@ function Explanations(currentPage: number) {
             <li>
               A <span style={{ color: "green" }}> green color </span> means{" "}
               <span style={{ color: "green" }}>GOOD ANSWER</span>. (Note: the REF is always
-              displayed in green because it is always true){" "}
+              displayed in green because it is always true)
             </li>
           </ul>
           <div id="piano_presentation_inline">
@@ -74,10 +74,10 @@ function Explanations(currentPage: number) {
             <li>
               A <span style={{ color: "green" }}> green color </span> means{" "}
               <span style={{ color: "green" }}>GOOD ANSWER</span>. (Note: the REF is always
-              displayed in green because it is always true){" "}
+              displayed in green because it is always true)
             </li>
             <li>
-              An <span style={{ color: "orange" }}> orange color </span> means{" "}
+              An <span style={{ color: "orange" }}> orange color </span> means
               <span style={{ color: "orange" }}>QUESTION</span>.
             </li>
           </ul>
@@ -99,7 +99,7 @@ function Explanations(currentPage: number) {
             <li>
               A <span style={{ color: "green" }}> green color </span> means{" "}
               <span style={{ color: "green" }}>GOOD ANSWER</span>. (Note: the REF is always
-              displayed in green because it is always true){" "}
+              displayed in green because it is always true)
             </li>
             <li>
               A <span style={{ color: "orange" }}> orange color </span> means{" "}
@@ -124,7 +124,7 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Question</h1>
-          <p>When a question is asked, the question will appear as follows:</p>
+          <p>When a question is asked, it will appear as follows:</p>
           <div id="piano_presentation_title_inline">Is the note a D?</div>
           <div id="piano_presentation_inline">
             <div className="piano_note note_activated"> REF </div>
@@ -227,7 +227,7 @@ export default function ExplanationLearningDemo({ onFinish }: ExplanationsLearni
     <div className="flex flex-col items-center w-screen min-h-screen gap-1">
       <Header title="Learning Task Demo" />
       <main className="flex flex-col items-center gap-4 w-full py-10">
-        <div className="min-h-100 w-1/3 flex flex-col justify-center items-center">
+        <div className="min-h-100 w-1/2 flex flex-col justify-center items-center">
           {Explanations(currentPage)}
         </div>
       </main>

@@ -57,7 +57,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
           <input
             type="text"
             value={inputCode}
-            className="border border-solid px-2 py-1"
+            className="border border-solid px-2 py-1 bg-white"
             placeholder="ammw01bn"
             onChange={(e) => setInputCode(e.target.value)}
           />
