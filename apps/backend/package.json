@@ -18,6 +18,7 @@
     "@fastify/cors": "^11.2.0",
     "@pitch-experiment/types": "workspace:*",
     "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
     "fastify": "^5.7.4"
   },
   "devDependencies": {

@@ -1,11 +1,23 @@
 import cors from "@fastify/cors";
+import * as dotenv from "dotenv";
 import Fastify from "fastify";
 import { participantRoutes } from "./routes/participantRoutes";
 
+dotenv.config();
+
 const fastify = Fastify({ logger: true });
 
+const devCorsUrls = [
+  "http://localhost:5173", // Vite dev
+  "http://localhost:4173", // Vite preview (build)
+];
+
+const FRONTEND_SERVER_URL = process.env.FRONTEND_SERVER_URL as string;
+
+const corsUrls = [...devCorsUrls, FRONTEND_SERVER_URL];
+
 await fastify.register(cors, {
-  origin: "http://localhost:5173", // Vite dev server
+  origin: corsUrls,
 });
 
 fastify.register(participantRoutes, { prefix: "/api" });
