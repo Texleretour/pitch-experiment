@@ -207,12 +207,18 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="INM TASK" />
 
-      <main className="h-fit w-screen flex justify-center items-center py-10">
+      <main className="min-h-100 w-screen flex justify-center items-center py-10">
         <div className="w-fit flex flex-col gap-4">
           {isPaused ? (
-            <p className="text-center text-2xl">Pausing for 2 seconds</p>
+            <p className="text-center text-2xl">
+              {" "}
+              <h1>Timeout!</h1> You only have {TRIAL_TIMEOUT / 1000} seconds to answer. Try to be
+              quickier!
+            </p>
           ) : (
-            <p className="text-center text-2xl">Current frequency: {currentFreq.toFixed(0)} Hz</p>
+            <p className="text-center text-2xl">
+              Current frequency: <h1>{currentFreq.toFixed(0)} Hz</h1>
+            </p>
           )}
           <div className="flex justify-center gap-4">
             <button type="button" onClick={() => adjustCurrentFreq(-2)}>
