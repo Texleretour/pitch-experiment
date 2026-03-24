@@ -192,7 +192,7 @@ const createLearningBlock = (
       </div> 
       <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
-          html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${i - 1}`}</div>`;
+          html += `<div class="piano_note interference"> </div>`;
         }
         html += `</div>`;
         return html;
