@@ -14,6 +14,7 @@ const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the refere
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 const NB_QUESTION = 4;
+const TIME_FEEDBACK = 3000;
 
 type JsPsychTrialData = {
   rt: number;
@@ -283,7 +284,7 @@ const createLearningDemo = (
         return html;
       },
       choices: "NO_KEYS",
-      trial_duration: 5000,
+      trial_duration: TIME_FEEDBACK,
     };
     // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {

@@ -18,6 +18,7 @@ const NB_UNIT = 2;
 const OCTAVES = [1, 2, 3];
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
+const TIME_FEEDBACK = 3000;
 
 type JsPsychTrialData = {
   rt: number;
@@ -322,7 +323,7 @@ const createLearningBlock = (
         return html;
       },
       choices: "NO_KEYS",
-      trial_duration: 5000,
+      trial_duration: TIME_FEEDBACK,
     };
     // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {
