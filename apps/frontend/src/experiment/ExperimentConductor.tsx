@@ -7,6 +7,7 @@ import {
 import { useRef, useState } from "react";
 import { DEBUG } from "../../config.json";
 import { postTaskData } from "../lib/api";
+import FinishPage from "./FinishPage";
 import ExplanationINM from "./inm/ExplanationINM";
 import INMTask from "./inm/INMTask";
 import ExplanationLearning from "./learning/ExplananationLearning";
@@ -118,7 +119,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     case "inm":
       return <INMTask onFinish={handleINMFinished} />;
     case "finished":
-      return <div>finito pipo gg</div>;
+      return <FinishPage />;
     default:
       return <div>wa zbi cquoi ca</div>;
   }
