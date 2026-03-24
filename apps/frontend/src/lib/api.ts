@@ -1,6 +1,6 @@
 import type { ApiResponse, isCodeActivated, TaskData } from "@pitch-experiment/types";
 
-const BASE_API = "http://localhost:3000/api";
+const BASE_API = `${import.meta.env.VITE_BACKEND_SERVER_URL}/api`;
 
 export const getCodeInfo = async (code: string): Promise<isCodeActivated> => {
   const response = await fetch(`${BASE_API}/code/${code}`);

@@ -27,8 +27,15 @@ cd pitch-experiment/
 pnpm install
 ```
 
-### Running
+### Running in a dev environment
+
+Create a .env file under frontend/ with the key VITE_BACKEND_SERVER_URL\
+Create a .env file under backend/ with the key FRONTEND_SERVER_URL
 
 ```bash
-pnpm run dev
+pnpm dev
 ```
+
+### Running in a production environment
+
+Build both the frontend and backend using `pnpm build`.
