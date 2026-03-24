@@ -82,7 +82,7 @@ function Explanations(currentPage: number) {
           <h1>The Arrow Buttons</h1>
           <ul className="list-disc">
             <li>
-              The simple arrow buttons (in <span className="text-green-700 font-bold">GREEN</span>)
+              The simple arrow buttons (in <span className="text-green-500 font-bold">GREEN</span>)
               are used to decrease/increase the frequency of your working note by 33 cents (
               <span className="font-bold">1 unit</span>)
             </li>
@@ -98,7 +98,7 @@ function Explanations(currentPage: number) {
                   title="Lower the pitch by 66 cents"
                 />
               </button>
-              <button type="button" style={{ backgroundColor: "green" }}>
+              <button type="button" style={{ backgroundColor: "lightgreen" }}>
                 <img
                   src={chevron}
                   alt="-33"
@@ -107,7 +107,7 @@ function Explanations(currentPage: number) {
                 />
               </button>
               <button type="button">Play current pitch</button>
-              <button type="button" style={{ backgroundColor: "green" }}>
+              <button type="button" style={{ backgroundColor: "lightgreen" }}>
                 <img
                   src={chevron}
                   alt="+33"
@@ -135,7 +135,7 @@ function Explanations(currentPage: number) {
           <h1>The Arrow Buttons</h1>
           <ul className="list-disc">
             <li>
-              The simple arrow buttons (in <span className="text-green-700 font-bold">GREEN</span>)
+              The simple arrow buttons (in <span className="text-green-500 font-bold">GREEN</span>)
               are used to decrease/increase the frequency of your working note by 33 cents (
               <span className="font-bold">1 unit</span>)
             </li>
@@ -156,7 +156,7 @@ function Explanations(currentPage: number) {
                   title="Lower the pitch by 66 cents"
                 />
               </button>
-              <button type="button" style={{ backgroundColor: "green" }}>
+              <button type="button" style={{ backgroundColor: "lightgreen" }}>
                 <img
                   src={chevron}
                   alt="-33"
@@ -165,7 +165,7 @@ function Explanations(currentPage: number) {
                 />
               </button>
               <button type="button">Play current pitch</button>
-              <button type="button" style={{ backgroundColor: "green" }}>
+              <button type="button" style={{ backgroundColor: "lightgreen" }}>
                 <img
                   src={chevron}
                   alt="+33"
@@ -245,19 +245,18 @@ function Explanations(currentPage: number) {
       return (
         <div className="flex flex-col gap-2 items-center w-full">
           <h1>The Sounds</h1>
-          In this task, you will be presented to 2 different types of sounds:
+          In this task, you will be presented with 2 different types of sounds:
           <ul className="list-disc">
             <li>
               <span className="font-bold">The Target Note:</span> this sound will be{" "}
               <span className="font-bold">automatically played</span> at the beginning of each
               trial. It is the sound you will try to <span className="font-bold">recreate</span>{" "}
-              thanks to the buttons.
+              using the buttons.
             </li>
             <li>
               <span className="font-bold">The Working Note:</span> this sound is the sound you will
               be working on. It is <span className="font-bold">not played</span>, unless you
-              explicitly click on the button to play it, or you modify it thanks to the arrow
-              buttons.
+              explicitly click on the button to play it, or you modify it using the arrow buttons.
             </li>
           </ul>
         </div>
