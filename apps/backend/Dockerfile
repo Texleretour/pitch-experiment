@@ -13,6 +13,9 @@ COPY apps/backend ./apps/backend
 # Install dependencies
 RUN pnpm install --frozen-lockfile --filter backend...
 
+# Build the app
+RUN pnpm build
+
 # Production stage
 FROM node:20-alpine
 
