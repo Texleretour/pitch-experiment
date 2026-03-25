@@ -28,6 +28,11 @@ fastify.get("/health", async () => {
   return { status: "ok" };
 });
 
+fastify.addHook("onRequest", (req, _reply, done) => {
+  console.log("Incoming request from origin:", req.headers.origin);
+  done();
+});
+
 const start = async () => {
   try {
     await fastify.listen({ port: 3000, host: "0.0.0.0" });
