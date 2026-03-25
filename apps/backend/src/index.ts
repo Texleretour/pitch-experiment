@@ -1,7 +1,7 @@
 import cors from "@fastify/cors";
 import * as dotenv from "dotenv";
 import Fastify from "fastify";
-import { participantRoutes } from "./routes/participantRoutes";
+import { participantRoutes } from "./routes/participantRoutes.js";
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const devCorsUrls = [
   "http://localhost:4173", // Vite preview (build)
 ];
 
-const FRONTEND_SERVER_URL = process.env.FRONTEND_SERVER_URL as string;
+const FRONTEND_SERVER_URL = process.env.CORS_ORIGIN as string;
 
 const corsUrls = [...devCorsUrls, FRONTEND_SERVER_URL];
 

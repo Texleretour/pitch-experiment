@@ -1,13 +1,14 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
-import { frontendUrl } from "../../config.json";
+import config from "../../config.json" with { type: "json" };
 import {
   createParticipant,
   generateParticipantCode,
   isCodeActivated,
-} from "../services/participantService";
-import { processINMData, processLearningData } from "../services/trialService";
+} from "../services/participantService.js";
+import { processINMData, processLearningData } from "../services/trialService.js";
 
+const { frontendUrl } = config;
 interface queryStringParameters {
   firstname: string;
   lastname: string;

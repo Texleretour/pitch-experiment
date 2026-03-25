@@ -1,5 +1,5 @@
 import type { Participant } from "@pitch-experiment/types";
-import { participantQueries } from "../db/queries";
+import { participantQueries } from "../db/queries.js";
 
 export function generateParticipantCode(
   firstname: string,

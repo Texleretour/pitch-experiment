@@ -1,5 +1,5 @@
 import type { INMTrialData, Participant } from "@pitch-experiment/types";
-import database from ".";
+import database from "./index.js";
 
 interface ParticipantRow {
   code: string;

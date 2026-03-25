@@ -1,5 +1,5 @@
 import type { INMTrialData, LearningTrialData } from "@pitch-experiment/types";
-import { trialQueries } from "../db/queries";
+import { trialQueries } from "../db/queries.js";
 
 export const processINMData = (participantCode: string, trials: INMTrialData[]) => {
   trialQueries.saveINMTrials(participantCode, trials);
