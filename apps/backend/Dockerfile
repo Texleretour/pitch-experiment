@@ -25,10 +25,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/backend ./apps/backend
 
-# Create data directory
-RUN mkdir -p /app/apps/backend/data
-
 WORKDIR /app/apps/backend
+
+RUN mkdir -p /app/apps/backend/data && \
+    chmod 755 /app/apps/backend/data
 
 EXPOSE 3000
 
