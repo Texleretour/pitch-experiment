@@ -71,6 +71,10 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const [endTrialMessage, setEndTrialMessage] = useState(
+    `You only have {TRIAL_TIMEOUT / 1000} seconds to answer. Try to be quicker!`,
+  );
+  const [endTrialMessageClass, setEndTrialMessageClass] = useState(`Timeout!`);
 
   const trialMaterialRef = useRef(
     generateINMUnit(POTENTIAL_TARGET_FREQS, POTENTIAL_STARTING_FREQS),
@@ -120,7 +124,17 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     playTone(newFreq);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (access: string) => {
+    if (access === "timeout") {
+      setEndTrialMessageClass(`Time's up!`);
+      setEndTrialMessage(
+        `You only have ${TRIAL_TIMEOUT / 1000} seconds to answer. Try to be quicker!`,
+      );
+    } else {
+      setEndTrialMessageClass(`Pause!`);
+      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} pause.`);
+    }
+
     if (trialTimeoutRef.current !== null) {
       clearTimeout(trialTimeoutRef.current);
       trialTimeoutRef.current = null;
@@ -189,7 +203,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
     const timeoutId = setTimeout(() => {
       DEBUG && console.log(`[INM] Trial ${trialNumber} timed out`);
-      handleConfirmEvent();
+      handleConfirmEvent("timeout");
     }, TRIAL_TIMEOUT);
 
     trialTimeoutRef.current = timeoutId;
@@ -211,9 +225,8 @@ export default function INMTask({ onFinish }: INMTaskProps) {
         <div className="w-fit flex flex-col gap-4">
           {isPaused ? (
             <p className="text-center text-2xl">
-              {" "}
-              <h1>Timeout!</h1> You only have {TRIAL_TIMEOUT / 1000} seconds to answer. Try to be
-              quickier!
+              <h1>{endTrialMessageClass}</h1>
+              {endTrialMessage}
             </p>
           ) : (
             <p className="text-center text-2xl">
@@ -257,7 +270,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
               />
             </button>
           </div>
-          <button type="button" onClick={handleConfirm}>
+          <button type="button" onClick={() => handleConfirm("manual")}>
             Confirm
           </button>
         </div>

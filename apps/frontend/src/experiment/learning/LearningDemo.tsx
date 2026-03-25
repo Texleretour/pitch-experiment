@@ -4,11 +4,11 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
+import { DEBUG } from "../../../config.json";
 import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
 
 const AUDIO_FILES_PATH = "/audio/learning/demo/";
-const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
