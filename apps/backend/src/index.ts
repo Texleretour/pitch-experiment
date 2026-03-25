@@ -13,6 +13,7 @@ const devCorsUrls = [
 ];
 
 const FRONTEND_SERVER_URL = process.env.CORS_ORIGIN as string;
+FRONTEND_SERVER_URL !== "" && console.log("Allowing env origin:", FRONTEND_SERVER_URL);
 
 const corsUrls = [...devCorsUrls, FRONTEND_SERVER_URL];
 
