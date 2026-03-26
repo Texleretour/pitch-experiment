@@ -184,17 +184,15 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     onFinish(INMTrialsDataRef.current);
   };
 
-  // Auto play the target every time it's updated
-  useEffect(() => {
-    playTone(targetFreq);
-  }, [targetFreq, playTone]);
-
   // On new trial: pick a new reference and target
   useEffect(() => {
     const newCombination = trialMaterialRef.current.draw();
 
     setCurrentFreq(newCombination.startingFreq);
     setTargetFreq(newCombination.targetFreq);
+
+    // Play the new sound
+    playTone(newCombination.targetFreq);
 
     DEBUG &&
       console.log(
@@ -211,7 +209,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [trialNumber, handleConfirmEvent]);
+  }, [trialNumber, handleConfirmEvent, playTone]);
 
   useEffect(() => {
     DEBUG && console.log("[INM] current freq: ", currentFreq);
@@ -224,14 +222,15 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       <main className="min-h-100 w-screen flex justify-center items-center py-10">
         <div className="w-fit flex flex-col gap-4">
           {isPaused ? (
-            <p className="text-center text-2xl">
-              <h1>{endTrialMessageClass}</h1>
-              {endTrialMessage}
-            </p>
+            <>
+              <h1 className="text-center text-2xl">{endTrialMessageClass}</h1>
+              <p className="text-center text-2xl">{endTrialMessage}</p>
+            </>
           ) : (
-            <p className="text-center text-2xl">
-              Current frequency: <h1>{currentFreq.toFixed(0)} Hz</h1>
-            </p>
+            <>
+              <p className="text-center text-2xl">Working note:</p>
+              <h1 className="text-center text-2xl">{currentFreq.toFixed(0)} Hz</h1>
+            </>
           )}
           <div className="flex justify-center gap-4">
             <button type="button" onClick={() => adjustCurrentFreq(-2)}>
@@ -270,7 +269,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
               />
             </button>
           </div>
-          <button type="button" onClick={() => handleConfirm("manual")}>
+          <button type="button" onClick={() => handleConfirm("manual")} disabled={isPaused}>
             Confirm
           </button>
         </div>
