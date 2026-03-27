@@ -6,9 +6,9 @@ type ExplanationsWelcomeProps = {
 
 export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsWelcomeProps) {
   return (
-    <div className="flex flex-col items-center w-screen min-h-screen gap-1">
+    <div className="flex flex-col items-center w-full gap-1">
       <Header title="WELCOME" />
-      <main className="flex flex-col items-center gap-4 w-full py-10">
+      <main className="flex flex-col items-center gap-4 py-10">
         <h1>Explanations</h1>
         <div className="w-2/3">
           <p>
