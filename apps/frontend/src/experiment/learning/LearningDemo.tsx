@@ -4,16 +4,17 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
+import { DEBUG } from "../../../config.json";
 import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
 
 const AUDIO_FILES_PATH = "/audio/learning/demo/";
-const DEBUG = true;
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
 const TARGETS = [1, 2, 3, 4]; // the targets are +1, +2, +3 , +4 from the reference
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 const NB_QUESTION = 4;
+const TIME_FEEDBACK = 3000;
 
 type JsPsychTrialData = {
   rt: number;
@@ -163,7 +164,7 @@ const createLearningDemo = (
       </div>
       <div id="piano_presentation">`;
         for (let i = 1; i <= TARGETS.length + 1; i++) {
-          html += `<div class="piano_note note_glitch">${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`}</div>`;
+          html += `<div class="piano_note interference"> </div>`;
         }
         html += `</div>`;
         return html;
@@ -283,7 +284,7 @@ const createLearningDemo = (
         return html;
       },
       choices: "NO_KEYS",
-      trial_duration: 5000,
+      trial_duration: TIME_FEEDBACK,
     };
     // Defining the procedure composed of the presentation of the reference and the presentation of the target
     const test_procedure = {

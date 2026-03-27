@@ -71,6 +71,10 @@ export default function INMTask({ onFinish }: INMTaskProps) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+  const [endTrialMessage, setEndTrialMessage] = useState(
+    `You only have {TRIAL_TIMEOUT / 1000} seconds to answer. Try to be quicker!`,
+  );
+  const [endTrialMessageClass, setEndTrialMessageClass] = useState(`Timeout!`);
 
   const trialMaterialRef = useRef(
     generateINMUnit(POTENTIAL_TARGET_FREQS, POTENTIAL_STARTING_FREQS),
@@ -120,7 +124,17 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     playTone(newFreq);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (access: string) => {
+    if (access === "timeout") {
+      setEndTrialMessageClass(`Time's up!`);
+      setEndTrialMessage(
+        `You only have ${TRIAL_TIMEOUT / 1000} seconds to answer. Try to be quicker!`,
+      );
+    } else {
+      setEndTrialMessageClass(`Pause!`);
+      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} pause.`);
+    }
+
     if (trialTimeoutRef.current !== null) {
       clearTimeout(trialTimeoutRef.current);
       trialTimeoutRef.current = null;
@@ -170,17 +184,15 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     onFinish(INMTrialsDataRef.current);
   };
 
-  // Auto play the target every time it's updated
-  useEffect(() => {
-    playTone(targetFreq);
-  }, [targetFreq, playTone]);
-
   // On new trial: pick a new reference and target
   useEffect(() => {
     const newCombination = trialMaterialRef.current.draw();
 
     setCurrentFreq(newCombination.startingFreq);
     setTargetFreq(newCombination.targetFreq);
+
+    // Play the new sound
+    playTone(newCombination.targetFreq);
 
     DEBUG &&
       console.log(
@@ -189,7 +201,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
 
     const timeoutId = setTimeout(() => {
       DEBUG && console.log(`[INM] Trial ${trialNumber} timed out`);
-      handleConfirmEvent();
+      handleConfirmEvent("timeout");
     }, TRIAL_TIMEOUT);
 
     trialTimeoutRef.current = timeoutId;
@@ -197,7 +209,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [trialNumber, handleConfirmEvent]);
+  }, [trialNumber, handleConfirmEvent, playTone]);
 
   useEffect(() => {
     DEBUG && console.log("[INM] current freq: ", currentFreq);
@@ -207,12 +219,18 @@ export default function INMTask({ onFinish }: INMTaskProps) {
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="INM TASK" />
 
-      <main className="h-fit w-screen flex justify-center items-center py-10">
+      <main className="min-h-100 w-screen flex justify-center items-center py-10">
         <div className="w-fit flex flex-col gap-4">
           {isPaused ? (
-            <p className="text-center text-2xl">Pausing for 2 seconds</p>
+            <>
+              <h1 className="text-center text-2xl">{endTrialMessageClass}</h1>
+              <p className="text-center text-2xl">{endTrialMessage}</p>
+            </>
           ) : (
-            <p className="text-center text-2xl">Current frequency: {currentFreq.toFixed(0)} Hz</p>
+            <>
+              <p className="text-center text-2xl">Working note:</p>
+              <h1 className="text-center text-2xl">{currentFreq.toFixed(0)} Hz</h1>
+            </>
           )}
           <div className="flex justify-center gap-4">
             <button type="button" onClick={() => adjustCurrentFreq(-2)}>
@@ -251,7 +269,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
               />
             </button>
           </div>
-          <button type="button" onClick={handleConfirm}>
+          <button type="button" onClick={() => handleConfirm("manual")} disabled={isPaused}>
             Confirm
           </button>
         </div>

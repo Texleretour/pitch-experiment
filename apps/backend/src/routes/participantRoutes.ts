@@ -1,12 +1,15 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
 import config from "../../config.json" with { type: "json" };
+import { participantQueries } from "../db/queries.js";
 import {
   createParticipant,
   generateParticipantCode,
   isCodeActivated,
 } from "../services/participantService.js";
 import { processINMData, processLearningData } from "../services/trialService.js";
+
+const DEFAULT_CODE = "323jf92d";
 
 const { frontendUrl } = config;
 interface queryStringParameters {
@@ -50,6 +53,8 @@ export async function participantRoutes(fastify: FastifyInstance) {
     try {
       if (payload.taskType === TaskTypes.INM) {
         processINMData(payload.participantCode, payload.data);
+        if (payload.participantCode !== DEFAULT_CODE)
+          participantQueries.desactivateCode(payload.participantCode);
       } else if (payload.taskType === TaskTypes.Learning) {
         processLearningData(payload.participantCode, payload.data);
       }

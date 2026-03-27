@@ -14,8 +14,16 @@ export default function FinishPage() {
             </p>
             <h1>Contacts</h1>
             <ul className="list-disc">
-              <li>nathan.hugon-hostens@grenoble-inp.org</li>
-              <li>mathias.devilliers@grenoble-inp.org</li>
+              <li>
+                <a href="mailto:nathan.hugon-hostens@grenoble-inp.org">
+                  nathan.hugon-hostens@grenoble-inp.org
+                </a>
+              </li>
+              <li>
+                <a href="mailto:mathias.devilliers@grenoble-inp.org">
+                  mathias.devilliers@grenoble-inp.org
+                </a>
+              </li>
             </ul>
           </div>
         </div>
