@@ -9,6 +9,8 @@ import {
 } from "../services/participantService.js";
 import { processINMData, processLearningData } from "../services/trialService.js";
 
+const DEFAULT_CODE = "323jf92d";
+
 const { frontendUrl } = config;
 interface queryStringParameters {
   firstname: string;
@@ -51,7 +53,8 @@ export async function participantRoutes(fastify: FastifyInstance) {
     try {
       if (payload.taskType === TaskTypes.INM) {
         processINMData(payload.participantCode, payload.data);
-        participantQueries.desactivateCode(payload.participantCode);
+        if (payload.participantCode !== DEFAULT_CODE)
+          participantQueries.desactivateCode(payload.participantCode);
       } else if (payload.taskType === TaskTypes.Learning) {
         processLearningData(payload.participantCode, payload.data);
       }

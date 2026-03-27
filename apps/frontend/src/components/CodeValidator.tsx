@@ -2,6 +2,8 @@ import { useState } from "react";
 import { getCodeInfo } from "../lib/api";
 import Header from "./ui/Header";
 
+const DEFAULT_CODE = "323jf92d";
+
 type CodeValidatorProps = {
   onCodeChange: (code: string | null) => void;
 };
@@ -10,7 +12,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
   const [codeActivation, setCodeActivation] = useState<"activated" | "default" | "error">(
     "default",
   );
-  const [inputCode, setInputCode] = useState<string>("323jf92d");
+  const [inputCode, setInputCode] = useState<string>(DEFAULT_CODE);
 
   async function fetchCodeInfo(code: string) {
     if (code === "") {
