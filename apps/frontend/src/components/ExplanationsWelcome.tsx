@@ -76,7 +76,11 @@ export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsW
         <div className="w-2/3">
           <p>
             During this task, you will hear different sounds. That is why an audio device such as{" "}
-            <strong>earphones or headphones</strong> is recommanded.
+            <strong>earphones or headphones</strong> is recommended.
+          </p>
+          <p>
+            To answer the questions, you will need a fonctionnal keyboard. You device needs to be a
+            tablet or <strong>bigger</strong> (computers, laptops...).
           </p>
           <p>
             The task will also take about half an hour. Please ensure that you are in a{" "}
