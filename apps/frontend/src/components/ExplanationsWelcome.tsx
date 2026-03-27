@@ -72,6 +72,22 @@ export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsW
           </ol>
           <p>This will be asked 64 times.</p>
         </div>
+        <h1>Some recommandations</h1>
+        <div className="w-2/3">
+          <p>
+            During this task, you will hear different sounds. That is why an audio device such as{" "}
+            <strong>earphones or headphones</strong> is recommended.
+          </p>
+          <p>
+            To answer the questions, you will need a functional keyboard. Your device needs to be a
+            tablet or <strong>bigger</strong> (computers, laptops...).
+          </p>
+          <p>
+            The task will also take about half an hour. Please ensure that you are in a{" "}
+            <strong>quiet room</strong>, free from disturbances, for the entire duration of the
+            experiment.
+          </p>
+        </div>
       </main>
       <button type="button" onClick={() => onExperimentStart()}>
         Go to the next one.

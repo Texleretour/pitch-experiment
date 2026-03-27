@@ -37,31 +37,31 @@ function Explanations(currentPage: number) {
             The main difference between the two tasks is the <strong>sounds</strong> you hear.
             Instead of hearing <strong style={{ fontSize: "1.3em" }}>letters</strong>, you will now
             hear <strong style={{ fontSize: "1.3em" }}>muscial notes</strong>. The scale will so be:
-            <div id="piano_presentation_inline">
-              <div className="piano_note note_deactivated"> REF </div>
-              <div className="piano_note note_deactivated"> +1 </div>
-              <div className="piano_note note_deactivated"> +2 </div>
-              <div className="piano_note note_deactivated"> +3 </div>
-              <div className="piano_note note_deactivated"> +4 </div>
-            </div>
-            <ul className="list-disc">
-              <li>
-                REF: the <strong>reference musical note</strong>.
-              </li>
-              <li>
-                +1: the note distanced by <strong>1</strong> tone from the reference.
-              </li>
-              <li>
-                +2: the note distanced by <strong>1</strong> tone from the "+1" note.
-              </li>
-              <li>
-                +3: the note distanced by <strong>1</strong> tone from the "+2" note.
-              </li>
-              <li>
-                +4: the note distanced by <strong>1</strong> tone from the "+3" note.
-              </li>
-            </ul>
           </p>
+          <div id="piano_presentation_inline">
+            <div className="piano_note note_deactivated"> REF </div>
+            <div className="piano_note note_deactivated"> +1 </div>
+            <div className="piano_note note_deactivated"> +2 </div>
+            <div className="piano_note note_deactivated"> +3 </div>
+            <div className="piano_note note_deactivated"> +4 </div>
+          </div>
+          <ul className="list-disc">
+            <li>
+              REF: the <strong>reference musical note</strong>.
+            </li>
+            <li>
+              +1: the note distanced by <strong>1</strong> tone from the reference.
+            </li>
+            <li>
+              +2: the note distanced by <strong>1</strong> tone from the "+1" note.
+            </li>
+            <li>
+              +3: the note distanced by <strong>1</strong> tone from the "+2" note.
+            </li>
+            <li>
+              +4: the note distanced by <strong>1</strong> tone from the "+3" note.
+            </li>
+          </ul>
         </div>
       );
 
