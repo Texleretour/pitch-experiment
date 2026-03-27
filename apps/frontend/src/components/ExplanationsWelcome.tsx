@@ -79,7 +79,7 @@ export default function ExplanationsWelcome({ onExperimentStart }: ExplanationsW
             <strong>earphones or headphones</strong> is recommended.
           </p>
           <p>
-            To answer the questions, you will need a fonctionnal keyboard. You device needs to be a
+            To answer the questions, you will need a functional keyboard. You device needs to be a
             tablet or <strong>bigger</strong> (computers, laptops...).
           </p>
           <p>
