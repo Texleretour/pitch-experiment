@@ -1,7 +1,7 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
-import { FRONTEND_SERVER_URL } from "../index.js";
 import { participantQueries } from "../db/queries.js";
+import { FRONTEND_SERVER_URL } from "../index.js";
 import {
   createParticipant,
   generateParticipantCode,
@@ -58,6 +58,7 @@ export async function participantRoutes(fastify: FastifyInstance) {
         processLearningData(payload.participantCode, payload.data);
       }
     } catch (e) {
+      fastify.log.error(`There was an error saving the trials data to the DB: ${e}`);
       return reply.send({ success: false, error: e });
     }
 
