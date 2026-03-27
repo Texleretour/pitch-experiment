@@ -28,6 +28,10 @@ export const participantQueries = {
       | ParticipantRow
       | undefined;
   },
+
+  desactivateCode: (code: string) => {
+    return database.prepare("UPDATE participants SET task_completed = 1 WHERE code = ?;").run(code);
+  },
 };
 
 export const trialQueries = {
