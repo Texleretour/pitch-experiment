@@ -10,7 +10,12 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const database: Database.Database = new Database(path.join(__dirname, "../../data/test.db"));
+let database: Database.Database;
+if (process.env.NODE_ENV === "DEV") {
+  database = new Database(path.join(__dirname, "../../data/test.db"));
+} else {
+  database = new Database(`${process.env.DATA_DIR} + '/db.sqlite'`);
+}
 
 database.pragma("foreign_keys = ON");
 

@@ -30,8 +30,9 @@ COPY --from=builder /app/apps/backend ./apps/backend
 
 WORKDIR /app/apps/backend
 
-RUN mkdir -p /app/apps/backend/data && \
-    chmod 755 /app/apps/backend/data
+RUN mkdir -p /data && \
+    chmod 755 /data
+ENV DATA_DIR=/data
 
 EXPOSE 3000
 
