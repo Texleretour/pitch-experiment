@@ -29,8 +29,8 @@ pnpm install
 
 ### Running in a dev environment
 
-Create a .env file under frontend/ with the key BACKEND_URL\
-Create a .env file under backend/ with the key FRONTEND_URL
+Create a .env file under frontend/ with the key VITE_API_URL\
+Create a .env file under backend/ with the keys FRONTEND_URL, PORT, ADMIM_TOKEN
 
 ```bash
 pnpm dev
