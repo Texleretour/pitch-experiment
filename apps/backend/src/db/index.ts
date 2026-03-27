@@ -11,10 +11,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let database: Database.Database;
-if (process.env.NODE_ENV === "DEV") {
-  database = new Database(path.join(__dirname, "../../data/test.db"));
-} else {
+console.log(process.env.NODE_ENV, process.env.DATA_DIR);
+if (process.env.NODE_ENV === "PROD") {
   database = new Database(`${process.env.DATA_DIR} + '/db.sqlite'`);
+} else {
+  database = new Database(path.join(__dirname, "../../data/test.db"));
 }
 
 database.pragma("foreign_keys = ON");
