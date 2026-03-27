@@ -1,6 +1,7 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
 import config from "../../config.json" with { type: "json" };
+import { participantQueries } from "../db/queries.js";
 import {
   createParticipant,
   generateParticipantCode,
@@ -50,6 +51,7 @@ export async function participantRoutes(fastify: FastifyInstance) {
     try {
       if (payload.taskType === TaskTypes.INM) {
         processINMData(payload.participantCode, payload.data);
+        participantQueries.desactivateCode(payload.participantCode);
       } else if (payload.taskType === TaskTypes.Learning) {
         processLearningData(payload.participantCode, payload.data);
       }
