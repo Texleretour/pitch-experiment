@@ -16,6 +16,7 @@ jobs:
           node-version: '20'
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
       - run: pnpm biome check .
   
   typecheck:
@@ -25,4 +26,5 @@ jobs:
       - uses: actions/setup-node@v4
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
       - run: pnpm type-check
