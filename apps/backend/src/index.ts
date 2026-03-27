@@ -31,11 +31,6 @@ fastify.get("/health", async () => {
 fastify.register(participantRoutes, { prefix: "/api" });
 fastify.register(adminRoutes, { prefix: "/api" });
 
-fastify.addHook("onRequest", (req, _reply, done) => {
-  fastify.log.info(`Incoming request from origin: ${req.headers.origin}`);
-  done();
-});
-
 const start = async () => {
   try {
     await fastify.listen({ port: Number(PORT), host: "0.0.0.0" });
