@@ -1,6 +1,6 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
-import config from "../../config.json" with { type: "json" };
+import { FRONTEND_SERVER_URL } from "../index.js";
 import { participantQueries } from "../db/queries.js";
 import {
   createParticipant,
@@ -11,7 +11,6 @@ import { processINMData, processLearningData } from "../services/trialService.js
 
 const DEFAULT_CODE = "323jf92d";
 
-const { frontendUrl } = config;
 interface queryStringParameters {
   firstname: string;
   lastname: string;
@@ -30,7 +29,7 @@ export async function participantRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ success: false, error: "t deja la" });
     }
 
-    return reply.redirect(frontendUrl);
+    return reply.redirect(FRONTEND_SERVER_URL);
   });
 
   fastify.get<{ Params: { code: string } }>("/code/:code", async (request, reply) => {

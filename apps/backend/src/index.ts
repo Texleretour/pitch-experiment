@@ -1,6 +1,7 @@
 import cors from "@fastify/cors";
 import * as dotenv from "dotenv";
 import Fastify from "fastify";
+import adminRoutes from "./routes/adminRoutes.js";
 import { participantRoutes } from "./routes/participantRoutes.js";
 
 dotenv.config();
@@ -12,8 +13,8 @@ const devCorsUrls = [
   "http://localhost:4173", // Vite preview (build)
 ];
 
-const FRONTEND_SERVER_URL = (process.env.CORS_ORIGIN as string) || "3000";
-const PORT = process.env.PORT as string;
+export const FRONTEND_SERVER_URL = process.env.CORS_ORIGIN as string;
+const PORT = (process.env.PORT as string) || "3000";
 FRONTEND_SERVER_URL !== "" && fastify.log.info(`Allowing env origin: ${FRONTEND_SERVER_URL}`);
 
 const corsUrls = [...devCorsUrls, FRONTEND_SERVER_URL];
@@ -28,6 +29,7 @@ fastify.get("/health", async () => {
 });
 
 fastify.register(participantRoutes, { prefix: "/api" });
+fastify.register(adminRoutes, { prefix: "/api" });
 
 fastify.addHook("onRequest", (req, _reply, done) => {
   fastify.log.info(`Incoming request from origin: ${req.headers.origin}`);

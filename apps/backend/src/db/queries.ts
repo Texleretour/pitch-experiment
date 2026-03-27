@@ -62,4 +62,24 @@ export const trialQueries = {
 
     insertManyTrials(trialsData);
   },
+  getAllTrials: () => {
+    const participants = database.prepare("SELECT * FROM participants").all();
+    const learningData = database.prepare("SELECT * FROM learning_task_trials").all();
+    const INMData = database.prepare("SELECT * FROM inm_task_trials").all();
+
+    return { participants, learningData, INMData };
+  },
+  getTrialStats: () => {
+    const participantCount = database
+      .prepare("SELECT COUNT(*) as count FROM participants")
+      .get() as { count: number };
+    const learningTrialsCount = database
+      .prepare("SELECT COUNT(*) as count FROM learning_task_trials")
+      .get() as { count: number };
+    const INMTrialsCount = database
+      .prepare("SELECT COUNT(*) as count FROM inm_task_trials")
+      .get() as { count: number };
+
+    return { participantCount, learningTrialsCount, INMTrialsCount };
+  },
 };
