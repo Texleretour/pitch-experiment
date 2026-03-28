@@ -132,7 +132,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       );
     } else {
       setEndTrialMessageClass(`Pause!`);
-      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} pause.`);
+      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} seconds pause.`);
     }
 
     if (trialTimeoutRef.current !== null) {
