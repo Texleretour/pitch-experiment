@@ -490,7 +490,7 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
     hasRun.current = true;
     if (!containerRef.current) return;
 
-    //preloading every notes of the current octave
+    //preloading every notes
     const preloadAll = async () => {
       await Promise.all(
         OCTAVES.flatMap((octave) => REF_NOTES.flatMap((ref) => preloadAudioFiles(octave, ref))),
