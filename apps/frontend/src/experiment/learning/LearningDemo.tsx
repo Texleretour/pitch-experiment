@@ -356,7 +356,7 @@ export default function LearningDemo({ onFinish }: LearningDemoProps) {
         </>
       )}
       {DEBUG && (
-        <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
+        <button type="button" className="absolute bottom-0 left-0" onClick={handleFinish}>
           finish
         </button>
       )}
