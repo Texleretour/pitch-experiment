@@ -132,7 +132,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
       );
     } else {
       setEndTrialMessageClass(`Pause!`);
-      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} pause.`);
+      setEndTrialMessage(`You have a ${INTER_TRIAL_GAP_MS / 1000} seconds pause.`);
     }
 
     if (trialTimeoutRef.current !== null) {
@@ -233,39 +233,39 @@ export default function INMTask({ onFinish }: INMTaskProps) {
             </>
           )}
           <div className="flex justify-center gap-4">
-            <button type="button" onClick={() => adjustCurrentFreq(-2)}>
+            <button type="button" onClick={() => adjustCurrentFreq(-2)} disabled={isPaused}>
               <img
                 src={doubleChevron}
                 alt="-66"
                 className="rotate-90 w-10"
-                title="Lower the pitch by 66 cents"
+                title="Lower the frequency by 66 cents"
               />
             </button>
-            <button type="button" onClick={() => adjustCurrentFreq(-1)}>
+            <button type="button" onClick={() => adjustCurrentFreq(-1)} disabled={isPaused}>
               <img
                 src={chevron}
                 alt="-33"
                 className="rotate-90 w-10"
-                title="Lower the pitch by 33 cents"
+                title="Lower the frequency by 33 cents"
               />
             </button>
-            <button type="button" onClick={() => playTone(currentFreq)}>
+            <button type="button" onClick={() => playTone(currentFreq)} disabled={isPaused}>
               Play current pitch
             </button>
-            <button type="button" onClick={() => adjustCurrentFreq(1)}>
+            <button type="button" onClick={() => adjustCurrentFreq(1)} disabled={isPaused}>
               <img
                 src={chevron}
                 alt="+33"
                 className="-rotate-90 w-10"
-                title="Increase the pitch by 33 cents"
+                title="Increase the frequency by 33 cents"
               />
             </button>
-            <button type="button" onClick={() => adjustCurrentFreq(2)}>
+            <button type="button" onClick={() => adjustCurrentFreq(2)} disabled={isPaused}>
               <img
                 src={doubleChevron}
                 alt="+66"
                 className="-rotate-90 w-10"
-                title="Increase the pitch by 66 cents"
+                title="Increase the frequency by 66 cents"
               />
             </button>
           </div>
