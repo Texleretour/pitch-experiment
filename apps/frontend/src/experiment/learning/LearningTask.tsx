@@ -456,6 +456,7 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
   const jsPsychRef = useRef<JsPsych | null>(null);
   const hasRun = useRef(false);
   const [completionPercent, setCompletionPercent] = useState(0);
+  const [preloadingSounds, setPreloadingSounds] = useState(true);
 
   const trueKey: string = responseKeys.trueKey;
   const falseKey: string = responseKeys.falseKey;
@@ -507,6 +508,8 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
         falseKey,
         setCompletionPercent,
       );
+
+      setPreloadingSounds(false);
       jsPsychRef.current.run(timeline);
     };
 
@@ -517,6 +520,7 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="LEARNING TASK" />
       <main className="h-fit w-screen flex justify-center items-center py-50">
+        {preloadingSounds && <h1>Loading...</h1>}
         <div ref={containerRef}></div>
       </main>
       {falseKey === "s" && (
@@ -532,7 +536,7 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
         </>
       )}
       {DEBUG && (
-        <button type="button" className="absolute top-0 left-0" onClick={handleFinish}>
+        <button type="button" className="absolute bottom-0 left-0" onClick={handleFinish}>
           finish
         </button>
       )}
