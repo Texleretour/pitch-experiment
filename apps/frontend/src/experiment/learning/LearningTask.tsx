@@ -19,6 +19,29 @@ const OCTAVES = [1, 2, 3];
 const TIME_TO_ANSWER = 5000; // the time to answer when the target is presented
 const INTERFERENCE_DURATION = 2000; // the time of the presentation of either the interference or the blank gap between ref and target
 const TIME_FEEDBACK = 3000;
+const audioCache = new Map<string, string>(); //the map that link a file name (sound) to its hidden version
+
+//preload all the sound files and filling the audiocache map
+const preloadAudioFiles = async (octaveNumber: number, referenceNumber: number) => {
+  const filesToLoad = [
+    `${octaveNumber}_${referenceNumber}.wav`,
+    ...TARGETS.map((t) => `${octaveNumber}_${referenceNumber + t * 2}.wav`),
+    `baseline.wav`,
+  ];
+
+  await Promise.all(
+    filesToLoad.map(async (fileName) => {
+      if (audioCache.has(fileName)) return;
+      const response = await fetch(`${AUDIO_FILES_PATH}${fileName}`);
+      const blob = await response.blob();
+      audioCache.set(fileName, URL.createObjectURL(blob));
+    }),
+  );
+};
+
+//getting the real name of the sound file from its hidden name
+const getRealName = (blobUrl: string) =>
+  [...audioCache.entries()].find(([, v]) => v === blobUrl)?.[0] ?? blobUrl;
 
 type JsPsychTrialData = {
   rt: number;
@@ -81,7 +104,7 @@ const createLearningBlock = (
   const experimentBlock: Timeline = [];
   // Pick a reference from the bucket
   const referenceNumber = referenceBucket.draw();
-  const urlReference = `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber}.wav`;
+  const urlReference = audioCache.get(`${octaveNumber}_${referenceNumber}.wav`)!;
 
   // Defining the bucket of the +1, +2, +3 and +4 targets (2 times to make 8 questions)
   const targets = new Bucket(TARGETS.concat(TARGETS));
@@ -98,7 +121,7 @@ const createLearningBlock = (
   const urlTargets = [];
   for (let stim = 0; stim <= TARGETS.length; stim++) {
     urlTargets.push({
-      stimulus: `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber + stim * 2}.wav`,
+      stimulus: audioCache.get(`${octaveNumber}_${referenceNumber + stim * 2}.wav`)!,
     });
   }
 
@@ -137,7 +160,12 @@ const createLearningBlock = (
   for (let i = 0; i < targetsLength; i++) {
     // Draw the target
     const currentTargetDistance = targets.draw();
-    const urlCurrentTarget = `${AUDIO_FILES_PATH}${octaveNumber}_${referenceNumber + currentTargetDistance * 2}.wav`;
+    const urlCurrentTarget = audioCache.get(
+      `${octaveNumber}_${referenceNumber + currentTargetDistance * 2}.wav`,
+    )!;
+
+    //RENOMMER URLCURRENTTARGET
+
     // Define if the target is true or false
     const isTrue = Math.random() < 0.5;
     // Initializing the falseProposition for each false question
@@ -153,6 +181,7 @@ const createLearningBlock = (
       // Re-adding the false proposition in the target list
       TARGETS.push(currentTargetDistance);
     }
+
     const interference = Math.random() < 0.5;
     // Generate the bloc to present the reference
     const referencePresentation = {
@@ -174,7 +203,7 @@ const createLearningBlock = (
       },
       on_start: (trial: { stimulus: string }) => {
         const { stimulus } = trial;
-        DEBUG && console.log("Reference presentation started ", stimulus);
+        DEBUG && console.log("Reference presentation started ", getRealName(stimulus));
       },
       on_finish: () => {
         !interference && DEBUG && console.log("No interference");
@@ -184,7 +213,7 @@ const createLearningBlock = (
     // Generate the block of the interference
     const interferencePresentation = {
       type: AudioKeyboardResponsePlugin,
-      stimulus: `${AUDIO_FILES_PATH}baseline.wav`,
+      stimulus: audioCache.get(`baseline.wav`)!,
       choices: "NO_KEYS",
       trial_duration: INTERFERENCE_DURATION,
       prompt: () => {
@@ -255,7 +284,7 @@ const createLearningBlock = (
       },
       on_start: (trial: { stimulus: string }) => {
         const { stimulus } = trial;
-        DEBUG && console.log("Test started ", stimulus);
+        DEBUG && console.log("Test started ", getRealName(stimulus));
       },
       on_finish: (data: JsPsychTrialData) => {
         DEBUG && console.log("resp: ", data.response);
@@ -461,18 +490,27 @@ export default function LearningTask({ responseKeys, onFinish }: LearningTaskPro
     hasRun.current = true;
     if (!containerRef.current) return;
 
-    jsPsychRef.current = initJsPsych({
-      display_element: containerRef.current,
-      on_finish: handleFinish,
-    });
+    //preloading every notes of the current octave
+    const preloadAll = async () => {
+      await Promise.all(
+        OCTAVES.flatMap((octave) => REF_NOTES.flatMap((ref) => preloadAudioFiles(octave, ref))),
+      );
 
-    const timeline = createLearningTask(
-      jsPsychRef.current,
-      trueKey,
-      falseKey,
-      setCompletionPercent,
-    );
-    jsPsychRef.current.run(timeline);
+      jsPsychRef.current = initJsPsych({
+        display_element: containerRef.current,
+        on_finish: handleFinish,
+      });
+
+      const timeline = createLearningTask(
+        jsPsychRef.current,
+        trueKey,
+        falseKey,
+        setCompletionPercent,
+      );
+      jsPsychRef.current.run(timeline);
+    };
+
+    preloadAll();
   }, [handleFinish, falseKey, trueKey]);
 
   return (
