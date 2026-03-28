@@ -36,6 +36,14 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
     }
   }
 
+  function inputKeyDown(key: string) {
+    if (key === "Enter") {
+      fetchCodeInfo(inputCode);
+    } else {
+      setCodeActivation("default");
+    }
+  }
+
   return (
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="Log in" />
@@ -62,6 +70,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
             className="border border-solid px-2 py-1 bg-white"
             placeholder="ammw01bn"
             onChange={(e) => setInputCode(e.target.value)}
+            onKeyDown={(e) => inputKeyDown(e.key)}
           />
           <button
             type="button"
