@@ -39,7 +39,8 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
   function inputKeyDown(key: string) {
     if (key === "Enter") {
       fetchCodeInfo(inputCode);
-    } else {
+    } else if (key.length === 1) {
+      // else if it is a character i remove the error message
       setCodeActivation("default");
     }
   }
@@ -87,6 +88,13 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
           </div>
         )}
       </main>
+      <div className="bottom-0">
+        To activate your code, please fill in the{" "}
+        <a href="https://framaforms.org/formulaire-de-participation-a-lexperience-organisee-par-hhn-dm-phelma-uga-1771938423">
+          form
+        </a>
+        .
+      </div>
     </div>
   );
 }
