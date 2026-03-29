@@ -39,8 +39,8 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
   function inputKeyDown(key: string) {
     if (key === "Enter") {
       fetchCodeInfo(inputCode);
-    } else if (key.length === 1) {
-      // else if it is a character i remove the error message
+    } else if (key.length === 1 || key === "Backspace") {
+      // else if it is a character of a backspace i remove the error message
       setCodeActivation("default");
     }
   }
@@ -87,6 +87,10 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
             end.
           </div>
         )}
+        <div className="color: gray font-style: italic opacity-60">
+          By confirming your code, you will be entering the experience; there will be no turning
+          back.
+        </div>
       </main>
       <div className="bottom-0">
         To activate your code, please fill in the{" "}
