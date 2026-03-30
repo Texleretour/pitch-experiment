@@ -36,6 +36,15 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
     }
   }
 
+  function inputKeyDown(key: string) {
+    if (key === "Enter") {
+      fetchCodeInfo(inputCode);
+    } else if (key.length === 1 || key === "Backspace") {
+      // else if it is a character of a backspace i remove the error message
+      setCodeActivation("default");
+    }
+  }
+
   return (
     <div className="flex flex-col items-center w-screen h-screen">
       <Header title="Log in" />
@@ -62,6 +71,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
             className="border border-solid px-2 py-1 bg-white"
             placeholder="ammw01bn"
             onChange={(e) => setInputCode(e.target.value)}
+            onKeyDown={(e) => inputKeyDown(e.key)}
           />
           <button
             type="button"
@@ -77,7 +87,18 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
             end.
           </div>
         )}
+        <div className="color: gray font-style: italic opacity-60">
+          By confirming your code, you will be entering the experience; there will be no turning
+          back.
+        </div>
       </main>
+      <div className="bottom-0">
+        To activate your code, please fill in the{" "}
+        <a href="https://framaforms.org/formulaire-de-participation-a-lexperience-organisee-par-hhn-dm-phelma-uga-1771938423">
+          form
+        </a>
+        .
+      </div>
     </div>
   );
 }
