@@ -33,7 +33,7 @@ export default function ExperimentConductor({ participantCode }: ExperimentCondu
     | "inmExplanation"
     | "inm"
     | "finished"
-  >("learning");
+  >("learningExplanationsBeforeDemo");
 
   const learningResponseKeys = useRef<LearningResponseKeys>({
     trueKey: "l", // default value
