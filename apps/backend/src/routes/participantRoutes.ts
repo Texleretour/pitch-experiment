@@ -1,7 +1,7 @@
 import { type TaskData, TaskTypes } from "@pitch-experiment/types";
 import type { FastifyInstance } from "fastify";
+import { CONFIG } from "../config.js";
 import { participantQueries } from "../db/queries.js";
-import { FRONTEND_SERVER_URL } from "../index.js";
 import {
   createParticipant,
   generateParticipantCode,
@@ -29,7 +29,7 @@ export async function participantRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ success: false, error: "t deja la" });
     }
 
-    return reply.redirect(FRONTEND_SERVER_URL);
+    return reply.redirect(CONFIG.FRONTEND_URL);
   });
 
   fastify.get<{ Params: { code: string } }>("/code/:code", async (request, reply) => {
