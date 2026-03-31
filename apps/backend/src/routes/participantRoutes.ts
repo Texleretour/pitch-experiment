@@ -21,7 +21,7 @@ interface queryStringParameters {
 export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Querystring: queryStringParameters }>("/participant", async (request, reply) => {
     const authorized_urls = ["https://framaforms.org/"];
-    if (request.headers.referer && !authorized_urls.includes(request.headers.referer)) {
+    if (!request.headers.referer || !authorized_urls.includes(request.headers.referer)) {
       reply.code(403).send({ success: false, error: "Unauthorized access" });
     }
 
