@@ -47,7 +47,6 @@ export async function participantRoutes(fastify: FastifyInstance) {
 
   fastify.post("/participant/data", async (request, reply) => {
     const payload = request.body as TaskData;
-    console.log("payload:", payload);
 
     try {
       if (payload.taskType === TaskTypes.INM) {

@@ -1,11 +1,7 @@
+import type { NODE_ENVS } from "@pitch-experiment/types";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-
-export enum NODE_ENVS {
-  DEV = "DEV",
-  PROD = "PROD",
-}
 
 export const CONFIG = {
   FRONTEND_URL: process.env.CORS_ORIGIN as string,

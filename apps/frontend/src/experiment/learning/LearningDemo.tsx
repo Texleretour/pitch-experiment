@@ -4,9 +4,9 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
-import { DEBUG } from "../../../config.json";
 import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
+import { DEBUG } from "../../config.js";
 
 const AUDIO_FILES_PATH = "/audio/learning/demo/";
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];

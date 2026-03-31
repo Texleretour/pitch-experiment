@@ -1,10 +1,10 @@
 import type { INMTrialData } from "@pitch-experiment/types";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { DEBUG } from "../../../config.json";
 import chevron from "../../assets/chevron-right-svgrepo-com.svg";
 import doubleChevron from "../../assets/chevrons-right-svgrepo-com.svg";
 import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
+import { DEBUG } from "../../config.js";
 import Bucket from "../../lib/bucket";
 
 function useEffectEvent<TArgs extends unknown[], TReturn>(

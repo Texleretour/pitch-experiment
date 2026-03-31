@@ -5,7 +5,7 @@ import {
   TaskTypes,
 } from "@pitch-experiment/types";
 import { useRef, useState } from "react";
-import { DEBUG } from "../../config.json";
+import { DEBUG } from "../config.js";
 import { postTaskData } from "../lib/api";
 import FinishPage from "./FinishPage";
 import ExplanationINM from "./inm/ExplanationINM";

@@ -5,9 +5,9 @@ import { initJsPsych, type JsPsych } from "jspsych";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Bucket from "../../lib/bucket";
 import "./style_learning.css";
-import { DEBUG } from "../../../config.json";
 import Header from "../../components/ui/Header";
 import ProgressBar from "../../components/ui/ProgressBar";
+import { DEBUG } from "../../config.js";
 
 const AUDIO_FILES_PATH = "/audio/learning/";
 type Timeline = Parameters<ReturnType<typeof initJsPsych>["run"]>[0];
@@ -104,7 +104,8 @@ const createLearningBlock = (
   const experimentBlock: Timeline = [];
   // Pick a reference from the bucket
   const referenceNumber = referenceBucket.draw();
-  const urlReference = audioCache.get(`${octaveNumber}_${referenceNumber}.wav`)!;
+  const referenceFile = `${octaveNumber}_${referenceNumber}.wav`;
+  const urlReference = audioCache.get(referenceFile) ?? referenceFile;
 
   // Defining the bucket of the +1, +2, +3 and +4 targets (2 times to make 8 questions)
   const targets = new Bucket(TARGETS.concat(TARGETS));
@@ -120,8 +121,9 @@ const createLearningBlock = (
   // All the possible targets from the reference
   const urlTargets = [];
   for (let stim = 0; stim <= TARGETS.length; stim++) {
+    const fileToPlay = `${octaveNumber}_${referenceNumber + stim * 2}.wav`;
     urlTargets.push({
-      stimulus: audioCache.get(`${octaveNumber}_${referenceNumber + stim * 2}.wav`)!,
+      stimulus: audioCache.get(fileToPlay) ?? fileToPlay,
     });
   }
 
@@ -160,11 +162,8 @@ const createLearningBlock = (
   for (let i = 0; i < targetsLength; i++) {
     // Draw the target
     const currentTargetDistance = targets.draw();
-    const urlCurrentTarget = audioCache.get(
-      `${octaveNumber}_${referenceNumber + currentTargetDistance * 2}.wav`,
-    )!;
-
-    //RENOMMER URLCURRENTTARGET
+    const targetFile = `${octaveNumber}_${referenceNumber + currentTargetDistance * 2}.wav`;
+    const urlCurrentTarget = audioCache.get(targetFile) ?? targetFile;
 
     // Define if the target is true or false
     const isTrue = Math.random() < 0.5;
@@ -213,7 +212,7 @@ const createLearningBlock = (
     // Generate the block of the interference
     const interferencePresentation = {
       type: AudioKeyboardResponsePlugin,
-      stimulus: audioCache.get(`baseline.wav`)!,
+      stimulus: audioCache.get(`baseline.wav`) ?? "baseline.wav",
       choices: "NO_KEYS",
       trial_duration: INTERFERENCE_DURATION,
       prompt: () => {
@@ -287,9 +286,6 @@ const createLearningBlock = (
         DEBUG && console.log("Test started ", getRealName(stimulus));
       },
       on_finish: (data: JsPsychTrialData) => {
-        DEBUG && console.log("resp: ", data.response);
-        DEBUG && console.log("true k", trueKey);
-        DEBUG && console.log("false k", falseKey);
         data.realDistance = currentTargetDistance;
         data.targetDistanceProposition = isTrue ? currentTargetDistance : falseProposition;
         data.correct =

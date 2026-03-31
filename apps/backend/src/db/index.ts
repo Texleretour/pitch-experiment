@@ -1,7 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { NODE_ENVS } from "@pitch-experiment/types";
 import Database from "better-sqlite3";
-import { CONFIG, NODE_ENVS } from "../config.js";
+import { CONFIG } from "../config.js";
 import { seedTestData } from "../scripts/seed.js";
 import { createSchema } from "./schema.js";
 
