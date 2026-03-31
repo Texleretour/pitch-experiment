@@ -22,6 +22,8 @@ export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Querystring: queryStringParameters }>("/participant", async (request, reply) => {
     const { firstname, lastname, birthday, birthcity }: queryStringParameters = request.query;
 
+    request.log.info(`[Participant] Incoming request from IP: ${request.ip}`);
+
     const code = generateParticipantCode(firstname, lastname, birthday, birthcity);
     const changes = createParticipant(code);
 
