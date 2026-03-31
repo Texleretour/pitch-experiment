@@ -1,10 +1,6 @@
-import * as dotenv from "dotenv";
 import type { FastifyInstance } from "fastify";
+import { CONFIG } from "../config.js";
 import { trialQueries } from "../db/queries.js";
-
-dotenv.config();
-
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN as string;
 
 interface queryStringParameters {
   token: string;
@@ -14,9 +10,7 @@ export default function adminRoutes(fastify: FastifyInstance) {
   fastify.addHook<{ Querystring: queryStringParameters }>("preHandler", async (request, reply) => {
     const token = request.query.token;
 
-    console.log(token, ADMIN_TOKEN);
-
-    if (token !== ADMIN_TOKEN) {
+    if (token !== CONFIG.ADMIN_TOKEN) {
       return reply.code(403).send({ error: "Unauthorized" });
     }
   });

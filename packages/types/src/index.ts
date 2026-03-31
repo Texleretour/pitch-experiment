@@ -51,3 +51,8 @@ export enum TaskTypes {
   INM = "inm",
   Learning = "learning",
 }
+
+export enum NODE_ENVS {
+  DEV = "development",
+  PROD = "production",
+}
