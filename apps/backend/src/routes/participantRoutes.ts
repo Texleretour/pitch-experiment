@@ -20,11 +20,12 @@ interface queryStringParameters {
 
 export async function participantRoutes(fastify: FastifyInstance) {
   fastify.get<{ Querystring: queryStringParameters }>("/participant", async (request, reply) => {
-    const { firstname, lastname, birthday, birthcity }: queryStringParameters = request.query;
+    const authorized_urls = ["https://framaforms.org/"];
+    if (request.headers.referer && !authorized_urls.includes(request.headers.referer)) {
+      reply.code(403).send({ success: false, error: "Unauthorized access" });
+    }
 
-    request.log.info(
-      `[Participant] Incoming request from IP: ${request.ip} with referer: ${request.headers.referer} and origin: ${request.headers.origin}`,
-    );
+    const { firstname, lastname, birthday, birthcity }: queryStringParameters = request.query;
 
     const code = generateParticipantCode(firstname, lastname, birthday, birthcity);
     const changes = createParticipant(code);
