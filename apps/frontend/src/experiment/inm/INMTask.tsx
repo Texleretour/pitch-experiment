@@ -30,7 +30,7 @@ const POTENTIAL_TARGET_FREQS = [349.23, 392, 415.3, 440];
 const POTENTIAL_STARTING_FREQS = [293.66, 311.13, 329.63, 349.23, 466.16, 493.88, 523.25, 554.37];
 
 const INTER_TRIAL_GAP_MS = 2000;
-const TRIAL_TIMEOUT = DEBUG ? 7000 : 10000;
+const TRIAL_TIMEOUT = DEBUG ? 7000 : 20000;
 
 const calculateError = (freq1: number, freq2: number): number => {
   return Math.round(36 * Math.log2(freq1 / freq2));
