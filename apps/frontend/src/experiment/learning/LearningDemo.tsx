@@ -78,6 +78,20 @@ const createLearningDemo = (
     stimulus: jsPsychInstance.timelineVariable("stimulus"),
     choices: "NO_KEYS",
     trial_duration: 1000,
+    prompt: () => {
+      let html = `
+      <div id="prompt_overlay" style="position: relative; z-index: 10;">
+      <div id="piano_presentation_title">
+      You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
+      </div>
+      <div id="piano_presentation">`;
+      for (let i = 1; i <= TARGETS.length + 1; i++) {
+        html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`} </div>`;
+      }
+      html += `</div></div>`;
+      note_scale_presented++;
+      return html;
+    },
   };
 
   let note_scale_presented = 1;
@@ -86,18 +100,30 @@ const createLearningDemo = (
   const scalePresentationProcedure = {
     timeline: [scalePresentation],
     timeline_variables: urlTargets,
-    prompt: () => {
+    on_load: () => {
+      const el = document.getElementById("piano_scale");
+      if (el) el.remove();
       let html = `
       <div id="piano_presentation_title">
       You are listening to the scale, starting by the reference and its ${TARGETS.length} following notes.
       </div>
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
-        html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `${String.fromCharCode(64 + i)}`} </div>`;
+        html += `<div class="piano_note note_deactivated"> ${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`} </div>`;
       }
-      html += `</div>`;
-      note_scale_presented++;
-      return html;
+      html += `</div></div>`;
+
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      div.id = "piano_scale";
+      document.body.appendChild(div);
+    },
+    on_timeline_start: () => {
+      note_scale_presented = 1;
+    },
+    on_timeline_finish: () => {
+      const el = document.getElementById("piano_scale");
+      if (el) el.remove();
     },
   };
 
