@@ -29,7 +29,7 @@ pnpm install
 
 ### Running in a dev environment
 
-Create a .env file under frontend/ with the key VITE_API_URL, NODE_ENV\
+Create a .env file under frontend/ with the key VITE_API_URL, VITE_NODE_ENV\
 Create a .env file under backend/ with the keys FRONTEND_URL, PORT, ADMIM_TOKEN, NODE_ENV, DATA_DIR
 
 ```bash
