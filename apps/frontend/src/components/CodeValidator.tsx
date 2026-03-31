@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DEBUG } from "../config";
 import { getCodeInfo } from "../lib/api";
 import Header from "./ui/Header";
 
@@ -12,7 +13,7 @@ export default function CodeValidator({ onCodeChange }: CodeValidatorProps) {
   const [codeActivation, setCodeActivation] = useState<"activated" | "default" | "error">(
     "default",
   );
-  const [inputCode, setInputCode] = useState<string>(DEFAULT_CODE);
+  const [inputCode, setInputCode] = useState<string>(DEBUG ? DEFAULT_CODE : "");
 
   async function fetchCodeInfo(code: string) {
     if (code === "") {
