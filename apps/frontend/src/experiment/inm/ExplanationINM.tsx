@@ -35,7 +35,7 @@ function Explanations(currentPage: number) {
           <h1>The Buttons</h1>
           To recreate the sound you hear, you will have access to the following tools:
           <div className="w-fit flex flex-col gap-4">
-            <p className="text-center text-2xl">Current frequency: {"XXX"} Hz</p>
+            <p className="text-center text-2xl">Match the target pitch using the buttons.</p>
             <div className="flex justify-center gap-4">
               <button type="button">
                 <img
@@ -88,7 +88,7 @@ function Explanations(currentPage: number) {
             </li>
           </ul>
           <div className="w-fit flex flex-col gap-4">
-            <p className="text-center text-2xl">Current frequency: {"XXX"} Hz</p>
+            <p className="text-center text-2xl">Match the target pitch using the buttons.</p>
             <div className="flex justify-center gap-4">
               <button type="button">
                 <img
@@ -146,7 +146,7 @@ function Explanations(currentPage: number) {
             </li>
           </ul>
           <div className="w-fit flex flex-col gap-4">
-            <p className="text-center text-2xl">Current frequency: {"XXX"} Hz</p>
+            <p className="text-center text-2xl">Match the target pitch using the buttons.</p>
             <div className="flex justify-center gap-4">
               <button type="button" style={{ backgroundColor: "lightblue" }}>
                 <img
@@ -198,7 +198,7 @@ function Explanations(currentPage: number) {
             </li>
           </ul>
           <div className="w-fit flex flex-col gap-4">
-            <p className="text-center text-2xl">Current frequency: {"XXX"} Hz</p>
+            <p className="text-center text-2xl">Match the target pitch using the buttons.</p>
             <div className="flex justify-center gap-4">
               <button type="button">
                 <img

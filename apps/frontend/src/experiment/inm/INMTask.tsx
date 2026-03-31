@@ -227,10 +227,7 @@ export default function INMTask({ onFinish }: INMTaskProps) {
               <p className="text-center text-2xl">{endTrialMessage}</p>
             </>
           ) : (
-            <>
-              <p className="text-center text-2xl">Working note:</p>
-              <h1 className="text-center text-2xl">{currentFreq.toFixed(0)} Hz</h1>
-            </>
+            <p className="text-center text-2xl">Match the target pitch using the buttons.</p>
           )}
           <div className="flex justify-center gap-4">
             <button type="button" onClick={() => adjustCurrentFreq(-2)} disabled={isPaused}>
