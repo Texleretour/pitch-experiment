@@ -109,7 +109,7 @@ const createLearningDemo = (
       </div>
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
-        html += `<div class="piano_note note_deactivated"> ${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`} </div>`;
+        html += `<div class="piano_note note_deactivated"> ${i === 1 ? "REF" : `${String.fromCharCode(64 + i)}`} </div>`;
       }
       html += `</div></div>`;
 
