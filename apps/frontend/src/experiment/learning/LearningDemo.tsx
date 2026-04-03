@@ -86,7 +86,7 @@ const createLearningDemo = (
       </div>
       <div id="piano_presentation">`;
       for (let i = 1; i <= TARGETS.length + 1; i++) {
-        html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `+${String.fromCharCode(64 + i)}`} </div>`;
+        html += `<div class="piano_note ${i === note_scale_presented ? "note_activated" : "note_deactivated"}"> ${i === 1 ? "REF" : `${String.fromCharCode(64 + i)}`} </div>`;
       }
       html += `</div></div>`;
       note_scale_presented++;
